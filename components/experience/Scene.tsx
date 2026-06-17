@@ -1,33 +1,35 @@
-import { useRef } from "react";
-import { useFrame } from "@react-three/fiber";
-import type { Mesh } from "three";
-import { theme } from "@/config/theme";
+import { useMemo } from "react";
+import { Vector3 } from "three";
+import Planet from "@/components/world/Planet";
+import Player from "@/components/player/Player";
+import CameraRig from "@/components/player/CameraRig";
+import { worldConfig } from "@/config/worldConfig";
+import type { PlayerTransform } from "@/types/world";
 
 /**
- * 3D 월드의 최상위 구성. Goal 1 단계에서는 조명 + 테스트 행성만 둔다.
- * Goal 2 에서 Planet / Player / CameraRig 로 확장한다.
+ * 3D 월드의 최상위 구성 — 조명 + 행성 + 플레이어 + 추적 카메라.
+ * Player(쓰기)와 CameraRig(읽기)가 공유하는 트랜스폼을 여기서 생성해 props 로 내린다.
+ * 이 객체는 매 프레임 ref 처럼 직접 변경되며 React state 를 거치지 않는다.
  */
 export default function Scene() {
-  const planetRef = useRef<Mesh>(null);
-
-  // 프레임마다 ref 로 직접 회전시킨다 — React state 갱신을 만들지 않는다.
-  // (docs/design/AGENTS.md: Prefer refs inside useFrame)
-  useFrame((_, delta) => {
-    if (planetRef.current) {
-      planetRef.current.rotation.y += delta * 0.15;
-    }
-  });
+  const playerTransform = useMemo<PlayerTransform>(
+    () => ({
+      // 북극(0, surfaceRadius, 0)에서 시작, +Z 를 바라봄(북극 접평면 위의 단위 벡터).
+      position: new Vector3(0, worldConfig.surfaceRadius, 0),
+      forward: new Vector3(0, 0, 1),
+      up: new Vector3(0, 1, 0),
+    }),
+    [],
+  );
 
   return (
     <>
       <ambientLight intensity={0.7} />
       <directionalLight position={[5, 8, 5]} intensity={1.1} />
 
-      {/* 테스트용 행성 프리뷰 — Goal 2 에서 components/world/Planet.tsx 로 교체 */}
-      <mesh ref={planetRef}>
-        <sphereGeometry args={[1.6, 32, 32]} />
-        <meshStandardMaterial color={theme.ground} />
-      </mesh>
+      <Planet />
+      <Player transform={playerTransform} />
+      <CameraRig transform={playerTransform} />
     </>
   );
 }
