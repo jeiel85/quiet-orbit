@@ -4,6 +4,7 @@ import { MathUtils, type Mesh, type MeshStandardMaterial, Vector3 } from "three"
 import { worldConfig } from "@/config/worldConfig";
 import { useGameStore } from "@/store/useGameStore";
 import { useMessageStore } from "@/store/useMessageStore";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import type { Message, MessageTone } from "@/types/message";
 
 // 톤별 Orb 색상.
@@ -35,6 +36,7 @@ export default function MessageOrb({ message, worldPosition, up }: MessageOrbPro
   const meshRef = useRef<Mesh>(null);
   const matRef = useRef<MeshStandardMaterial>(null);
   const isRead = useMessageStore((s) => s.readMessageIds.includes(message.id));
+  const reduceMotion = useSettingsStore((s) => s.reduceMotion);
   const color = message.tone ? TONE_COLOR[message.tone] : DEFAULT_COLOR;
 
   // id 기반 결정적 위상차 — 모든 Orb 가 동시에 출렁이지 않게.
@@ -50,14 +52,19 @@ export default function MessageOrb({ message, worldPosition, up }: MessageOrbPro
     const game = useGameStore.getState();
     const active = game.activeMessageId === message.id && game.openedMessageId === null;
 
-    // 위아래 floating
-    const bob = Math.sin(elapsed.current * 1.4 + phase) * 0.05;
-    _pos.copy(worldPosition).addScaledVector(up, bob);
-    mesh.position.copy(_pos);
-    mesh.rotation.y += delta * 0.6;
+    // 위아래 floating + 회전 (reduce motion 이면 정지).
+    if (reduceMotion) {
+      mesh.position.copy(worldPosition);
+    } else {
+      const bob = Math.sin(elapsed.current * 1.4 + phase) * 0.05;
+      _pos.copy(worldPosition).addScaledVector(up, bob);
+      mesh.position.copy(_pos);
+      mesh.rotation.y += delta * 0.6;
+    }
 
-    // 크기: read 면 작게, active 면 살짝 커짐
-    const base = isRead ? 0.7 : 1;
+    // 크기: read 면 작게, active 면 살짝 커짐. unread 는 은은한 pulse.
+    const pulse = reduceMotion || isRead ? 0 : Math.sin(elapsed.current * 2 + phase) * 0.04;
+    const base = (isRead ? 0.7 : 1) + pulse;
     const targetScale = active ? base * 1.3 : base;
     scaleRef.current = MathUtils.lerp(scaleRef.current, targetScale, 1 - Math.exp(-8 * delta));
     mesh.scale.setScalar(scaleRef.current);

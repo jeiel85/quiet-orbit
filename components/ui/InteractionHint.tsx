@@ -6,10 +6,11 @@ import { useGameStore } from "@/store/useGameStore";
  * 패널이 열려 있으면 숨긴다. 클릭을 가로채지 않도록 pointer-events 는 끈 상태.
  */
 export default function InteractionHint() {
+  const started = useGameStore((s) => s.started);
   const activeId = useGameStore((s) => s.activeMessageId);
   const openedId = useGameStore((s) => s.openedMessageId);
 
-  if (!activeId || openedId) return null;
+  if (!started || !activeId || openedId) return null;
   const message = messages.find((m) => m.id === activeId);
 
   return (

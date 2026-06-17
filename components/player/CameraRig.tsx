@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Vector3 } from "three";
 import { worldConfig } from "@/config/worldConfig";
+import { useSettingsStore } from "@/store/useSettingsStore";
 import type { PlayerTransform } from "@/types/world";
 
 const _desired = new Vector3();
@@ -27,10 +28,13 @@ export default function CameraRig({ transform }: CameraRigProps) {
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
 
+    // 모바일은 카메라를 약간 멀게 둔다(설계 권장 — 좁은 화면에서 시야 확보).
+    const distance = useSettingsStore.getState().isTouch ? cam.distance * 1.15 : cam.distance;
+
     _desired
       .copy(transform.position)
       .addScaledVector(transform.up, cam.height)
-      .addScaledVector(transform.forward, -cam.distance);
+      .addScaledVector(transform.forward, -distance);
 
     if (!snapped.current) {
       // 첫 프레임은 Canvas 기본 카메라 위치에서 날아오지 않도록 즉시 스냅.
