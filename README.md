@@ -8,6 +8,7 @@
 > 고품질 브라우저 3D 경험에서 *감성적 구조*만 벤치마킹한 **독립 프로젝트**입니다.
 > 특정 사이트의 브랜드·캐릭터·에셋·맵·텍스트를 복제하지 않습니다.
 
+▶️ **라이브 데모** · https://quiet-orbit.vercel.app
 🪐 **소개 페이지** · https://jeiel85.github.io/quiet-orbit/
 📐 **설계 문서** · [`docs/design/`](docs/design/)
 
@@ -18,7 +19,7 @@
 - **zustand** (전역 상태)
 - **Tailwind CSS v4**
 - **localStorage** (MVP 진행도 저장)
-- **Vercel** 배포 대상 (아래 [배포](#배포-vercel) 참고)
+- **Vercel** 배포 — 라이브: https://quiet-orbit.vercel.app
 
 ## 주요 기능
 
@@ -93,7 +94,8 @@ docs/                     GitHub Pages 소개 페이지 + 설계 묶음(docs/des
 이 저장소에는 두 가지 다른 배포가 있습니다.
 
 - **소개 페이지**(`docs/index.html`)는 **GitHub Pages** 로 자동 배포됩니다 — 위 🪐 링크.
-- **실제 3D 앱**(Next.js)은 **Vercel** 에 배포합니다. (현재는 미연결 — 아래 절차로 연결)
+- **실제 3D 앱**(Next.js)은 **Vercel** 에 배포됩니다 — 라이브: https://quiet-orbit.vercel.app
+  GitHub 저장소가 연결돼 있어 `main` 에 push 하면 자동으로 프로덕션 배포됩니다.
 
 ### GitHub 연결 배포
 
