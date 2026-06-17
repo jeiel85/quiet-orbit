@@ -37,7 +37,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 2. Planet + Player + CameraRig — ✅ 완료
 3. Message Orb + 상호작용 UI + localStorage — ✅ 완료
 4. 모바일 조작 + 비주얼 폴리싱 + 성능 — ✅ 완료
-5. Vercel 배포 정리 + 온라인 확장 훅
+5. Vercel 배포 정리 + 온라인 확장 훅 — ✅ 완료
 
 ## Definition of Done (MVP)
 - `npm run build` 통과

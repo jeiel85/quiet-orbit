@@ -6,7 +6,11 @@ import type { Message } from "@/types/message";
  * 플레이어가 북극(phi≈0)에서 시작하므로 메시지는 phi 0.8~2.2 사이에 흩어 둔다.
  *
  * 원본 사이트(messenger.abeto.co)의 텍스트를 복제하지 않은 독립 문구.
- * 후속 확장(Goal 5): 이 배열을 그대로 두고 서버/방명록 소스로 합치기 쉽게 유지.
+ *
+ * 확장 seam: 후속(v0.2 guestbook)에서는 이 내장 배열을 그대로 두고,
+ * 원격 소스(Supabase `guest_messages`)에서 받은 항목을 types/online.ts 의
+ * GuestMessageToMessage 어댑터로 변환해 하나의 목록으로 합쳐 렌더한다.
+ * 즉 "내장 + 원격" 을 합치는 지점만 추가하면 되도록 구조를 단순하게 유지한다.
  */
 export const messages: Message[] = [
   {

@@ -4,6 +4,10 @@ import { loadProgress, saveProgress } from "@/lib/storage/localProgress";
 // 모듈 로드 시 localStorage 에서 초기화한다.
 // 이 store 는 ssr:false 인 Experience 서브트리에서만 import 되므로 클라이언트에서만 평가된다.
 // (loadProgress 내부에 window 가드가 있어 비브라우저에서도 안전)
+//
+// 확장 seam: 읽음 상태는 지금은 localStorage 전용이다. 후속에 서버(Supabase)를 붙이면
+// loadProgress/saveProgress 자리를 원격 동기화로 교체하거나 병행하면 되도록,
+// 영속화 접근을 lib/storage/localProgress.ts 한 곳에 모아 두었다.
 const initial = loadProgress();
 
 interface MessageStore {
