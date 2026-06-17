@@ -3,7 +3,6 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useMemo } from "react";
 import Scene from "./Scene";
-import { theme } from "@/config/theme";
 import { isTouchDevice } from "@/lib/device";
 import { useKeyboardInput } from "@/components/controls/useKeyboardInput";
 import { useInteractionKeys } from "@/components/controls/useInteractionKeys";
@@ -12,14 +11,18 @@ import IntroOverlay from "@/components/ui/IntroOverlay";
 import MessagePanel from "@/components/ui/MessagePanel";
 import MobileJoystick from "@/components/controls/MobileJoystick";
 
+// 새벽빛 그라데이션 하늘 — 투명 캔버스 뒤에서 CSS 로 깐다(셰이더 없이 안정적).
+const SKY_GRADIENT =
+  "linear-gradient(180deg, #a7d8ef 0%, #c8e9f1 52%, #f2e3cd 100%)";
+
 /**
  * 전체 화면 WebGL Canvas + UI 오버레이 레이어.
+ * - 배경: CSS 그라데이션(투명 캔버스가 위에 얹힘)
  * - 3D 레이어: <Canvas> 안의 Scene
  * - UI 레이어: 인트로 / 힌트 / 메시지 패널 / 모바일 조이스틱
  * 성능: 모바일은 dpr 상한과 antialias 를 낮춘다(설계 08).
  */
 export default function Experience() {
-  // 입력 리스너 부착 (싱글톤에 기록) + 메시지 상호작용 키.
   useKeyboardInput();
   useInteractionKeys();
 
@@ -27,13 +30,12 @@ export default function Experience() {
   const dpr = useMemo<[number, number]>(() => (touch ? [1, 1.25] : [1, 1.5]), [touch]);
 
   return (
-    <div className="fixed inset-0">
+    <div className="fixed inset-0" style={{ background: SKY_GRADIENT }}>
       <Canvas
         dpr={dpr}
-        gl={{ antialias: !touch, powerPreference: "high-performance" }}
+        gl={{ antialias: !touch, alpha: true, powerPreference: "high-performance" }}
         camera={{ fov: 45, near: 0.1, far: 100, position: [0, 3, 7] }}
       >
-        <color attach="background" args={[theme.sky]} />
         <Suspense fallback={null}>
           <Scene />
         </Suspense>

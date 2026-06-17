@@ -48,6 +48,7 @@ export default function Player({ transform }: PlayerProps) {
   const tailRef = useRef<Group>(null); // 꼬리 스윙
   const shadowRef = useRef<Mesh>(null);
   const legRefs = useRef<Array<Group | null>>([null, null, null, null]);
+  const earRefs = useRef<Array<Mesh | null>>([null, null]);
 
   const phase = useRef(0); // 걸음 주기
   const elapsed = useRef(0); // idle 시간(항상 증가)
@@ -111,6 +112,15 @@ export default function Player({ transform }: PlayerProps) {
       else leg.rotation.x = damp(leg.rotation.x, 0, 14, delta);
     }
 
+    // 귀: 걸을 때 까딱, 정지 중 은은한 idle. (base z 회전은 유지하고 x 만 건드림)
+    const earFlop = reduceMotion
+      ? 0
+      : moving
+        ? Math.sin(phase.current) * 0.12
+        : Math.sin(elapsed.current * 1.3) * 0.04;
+    if (earRefs.current[0]) earRefs.current[0].rotation.x = earFlop;
+    if (earRefs.current[1]) earRefs.current[1].rotation.x = earFlop;
+
     // 꼬리: 이동 중 크게, 정지 중 은은한 idle 흔들림.
     const tail = tailRef.current;
     if (tail) {
@@ -172,11 +182,23 @@ export default function Player({ transform }: PlayerProps) {
         </mesh>
 
         {/* 귀 */}
-        <mesh position={[0.085, 0.27, 0.1]} rotation={[0, 0, -0.25]}>
+        <mesh
+          ref={(el) => {
+            earRefs.current[0] = el;
+          }}
+          position={[0.085, 0.27, 0.1]}
+          rotation={[0, 0, -0.25]}
+        >
           <coneGeometry args={[0.055, 0.13, 12]} />
           <meshStandardMaterial color={FUR} roughness={0.7} />
         </mesh>
-        <mesh position={[-0.085, 0.27, 0.1]} rotation={[0, 0, 0.25]}>
+        <mesh
+          ref={(el) => {
+            earRefs.current[1] = el;
+          }}
+          position={[-0.085, 0.27, 0.1]}
+          rotation={[0, 0, 0.25]}
+        >
           <coneGeometry args={[0.055, 0.13, 12]} />
           <meshStandardMaterial color={FUR} roughness={0.7} />
         </mesh>
