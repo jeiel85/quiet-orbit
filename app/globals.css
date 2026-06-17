@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* Yoonseul Blue 팔레트 (config/theme.ts 와 동일 값) */
+:root {
+  --color-background: #eaf7fa;
+  --color-sky: #bdeaf2;
+  --color-ground: #b9ddbe;
+  --color-accent: #f7c76b;
+  --color-text: #25323a;
+  --color-shadow: #7293a0;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+/* 전체 화면 3D 경험 — 스크롤/바운스 제거, 본문은 캔버스가 채운다 */
+body {
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: var(--color-sky);
+  color: var(--color-text);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* WebGL 캔버스는 블록 요소로 두고 터치 제스처를 직접 처리하게 한다 */
+canvas {
+  display: block;
+  touch-action: none;
+}

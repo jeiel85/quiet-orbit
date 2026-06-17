@@ -1,47 +1,50 @@
-# Messenger-inspired Planet Web Design Bundle
+# Yoonseul Planet
 
-이 문서는 `messenger.abeto.co` 같은 고품질 브라우저 3D 경험을 **직접 복제하지 않고**, 감성적인 작은 행성 산책 웹사이트로 벤치마킹하기 위한 설계 묶음입니다.
+작은 행성 위를 천천히 산책하며, 빛나는 메시지 조각(Orb)을 발견하는 **조용한 3D 웹 경험**입니다.
+경쟁도 점수도 없이, 1분 남짓 머물며 따뜻한 흔적을 읽고 가는 스탠드얼론 인터랙티브 사이트를 목표로 합니다.
 
-## 핵심 방향
+> 고품질 브라우저 3D 경험에서 *감성적 구조*만 벤치마킹한 **독립 프로젝트**입니다.
+> 특정 사이트의 브랜드·캐릭터·에셋·맵·텍스트를 복제하지 않습니다.
 
-- **1차 목표:** 스탠드얼론 3D WebGL 웹사이트
-- **배포:** Vercel
-- **프론트엔드:** Next.js App Router + TypeScript
-- **3D:** Three.js + React Three Fiber + drei
-- **상태관리:** zustand
-- **저장:** 1차는 localStorage
-- **온라인 확장:** Supabase / PartyKit은 후속 단계
-- **금지:** 원본 사이트의 브랜드, 텍스트, 에셋, 캐릭터, 레벨 구조 복제
+## 기술 스택
 
-## 이 묶음의 사용법
+- **Next.js (App Router) + TypeScript**
+- **Three.js + @react-three/fiber + @react-three/drei**
+- **zustand** (전역 상태)
+- **Tailwind CSS v4**
+- **localStorage** (MVP 진행도 저장)
+- **Vercel** 배포
 
-1. `12_master_prompt.md`를 먼저 개발 도구에 넣어 전체 방향을 잡습니다.
-2. 실제 구현은 `11_development_goals.md`의 Goal 1~5 순서로 진행합니다.
-3. 구현 중 헷갈리는 구조는 `03_folder_structure.md`, `04_component_design.md`, `07_data_model_and_state.md`를 기준으로 맞춥니다.
-4. 배포 전에는 `15_testing_checklist.md`와 `09_deployment_vercel.md`를 확인합니다.
+## 현재 상태
 
-## 추천 구현 순서
+개발은 `docs/design/11_development_goals.md` 의 Goal 1~5 순서로 진행합니다.
 
-```txt
-Goal 1: 프로젝트 스캐폴딩 + 전체 화면 Canvas
-Goal 2: 작은 행성 + 플레이어 + 카메라
-Goal 3: Message Orb + 상호작용 UI + localStorage
-Goal 4: 모바일 조작 + 비주얼 폴리싱 + 성능 최적화
-Goal 5: Vercel 배포 + 후속 온라인 확장 준비
+- [x] **Goal 1** — 프로젝트 스캐폴딩 + 전체 화면 3D Canvas
+- [ ] **Goal 2** — 행성 + 플레이어 + 3인칭 카메라
+- [ ] **Goal 3** — 메시지 Orb + 상호작용 UI + localStorage
+- [ ] **Goal 4** — 모바일 조작 + 비주얼 폴리싱 + 성능
+- [ ] **Goal 5** — Vercel 배포 정리 + 온라인 확장 준비
+
+## 로컬 실행
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+npm run build    # 프로덕션 빌드 검증
+npm run lint
 ```
 
-## 산출 기준
+## 폴더 구조 (요약)
 
-최초 완성 버전은 다음 수준이면 충분합니다.
+```txt
+app/                      Next.js 엔트리 (layout/page/globals.css)
+components/experience/    Canvas · Scene 등 3D 경험 구성
+components/ui/            HTML 오버레이 UI
+config/                   theme 등 설정값
+docs/design/              제품·기술 설계 묶음 (00~17, AGENTS 등)
+```
 
-- 브라우저에서 전체 화면 3D 공간이 열린다.
-- 작은 행성 위를 캐릭터가 움직인다.
-- 카메라가 캐릭터를 부드럽게 따라간다.
-- 메시지 오브젝트 근처에 가면 상호작용이 가능하다.
-- 읽은 메시지는 새로고침 후에도 유지된다.
-- 모바일에서도 최소한의 조작이 가능하다.
-- Vercel에 배포 가능하다.
+## 설계 문서
 
-## 작성일
-
-- 2026-06-17
+전체 기획·기술 설계는 [`docs/design/`](docs/design/) 에 있습니다.
+시작점은 [`docs/design/README.md`](docs/design/README.md) 입니다.
