@@ -8,7 +8,7 @@
 > 고품질 브라우저 3D 경험에서 *감성적 구조*만 벤치마킹한 **독립 프로젝트**입니다.
 > 특정 사이트의 브랜드·캐릭터·에셋·맵·텍스트를 복제하지 않습니다.
 
-🪐 **소개 페이지** · https://jeiel85.github.io/messenger-planet-web/
+🪐 **소개 페이지** · https://jeiel85.github.io/quiet-orbit/
 📐 **설계 문서** · [`docs/design/`](docs/design/)
 
 ## 기술 스택
