@@ -1,11 +1,12 @@
 import { useRef } from "react";
 import { useFrame } from "@react-three/fiber";
-import { Group, MathUtils, Matrix4, Quaternion, Vector3 } from "three";
+import { Group, MathUtils, Matrix4, type Mesh, Quaternion, Vector3 } from "three";
 import { resolveMovement } from "@/lib/input/movementInput";
 import { moveAlongSurface, turn } from "@/lib/math/sphericalMovement";
 import { worldConfig } from "@/config/worldConfig";
 import { useGameStore } from "@/store/useGameStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
+import ShadowBlob from "@/components/world/ShadowBlob";
 import type { PlayerTransform } from "@/types/world";
 
 // 프레임마다 재사용하는 임시값 (할당 없음).
@@ -13,28 +14,32 @@ const _right = new Vector3();
 const _basis = new Matrix4();
 const _quat = new Quaternion();
 
+// 둥근 캐릭터 색.
+const FUR = "#e8965a";
+const FUR_DARK = "#cf7a3f";
+const CREAM = "#f6e8d6";
+const DARK = "#39291f";
+
 interface PlayerProps {
   /** Scene 이 소유하고 CameraRig 와 공유하는 트랜스폼. 여기서 매 프레임 갱신한다. */
   transform: PlayerTransform;
 }
 
 /**
- * 플레이어 아바타 + 구면 이동 로직.
- * - 입력은 resolveMovement()(키보드+조이스틱 합산)에서 읽는다.
- * - 위치/방향은 transform(공유 ref)에 직접 쓰고, 그 값으로 group 을 배치한다.
- * - useFrame 안에서 React state 를 만들지 않는다(store 는 getState 로 비반응 읽기).
+ * 플레이어 = 둥근 동물 친구(여우풍). 로컬 +Y = 표면 위, +Z = 정면(얼굴/진행 방향).
+ * - 이동 로직은 그대로(resolveMovement → 구면 이동). useFrame 안 React state 갱신 없음.
+ * - bobbing 은 캐릭터만 적용하고, 발밑 그림자(blob)는 표면에 고정되도록 매 프레임 보정.
  */
 export default function Player({ transform }: PlayerProps) {
   const groupRef = useRef<Group>(null);
-  const bob = useRef(0); // 이동 중 미세한 위아래 흔들림
+  const shadowRef = useRef<Mesh>(null);
+  const bob = useRef(0);
   const bobPhase = useRef(0);
 
   useFrame((_, rawDelta) => {
-    // 탭 복귀 직후 큰 delta 로 순간이동하는 것을 방지.
     const delta = Math.min(rawDelta, 0.05);
 
     const game = useGameStore.getState();
-    // 시작 전이거나 메시지 패널이 열려 있으면 이동 비활성화.
     const locked = !game.started || game.openedMessageId !== null;
     const { forward: rawForward, turn: rawTurn } = resolveMovement();
     const moveDir = locked ? 0 : rawForward;
@@ -43,49 +48,118 @@ export default function Player({ transform }: PlayerProps) {
     const { reduceMotion, isTouch } = useSettingsStore.getState();
     const speed = isTouch ? worldConfig.moveSpeed * 0.9 : worldConfig.moveSpeed;
 
-    // 좌우 회전 (D = 우회전). 부호가 반대로 느껴지면 여기 부호만 뒤집으면 된다.
+    // 회전 (D = 우회전). 부호가 반대로 느껴지면 여기 부호만 뒤집으면 된다.
     turn(transform.forward, transform.up, -turnDir * worldConfig.turnSpeed * delta);
 
-    // 전/후진 — 표면 위 대원 이동
     if (moveDir !== 0) {
       const arc = (moveDir * speed * delta) / worldConfig.surfaceRadius;
       moveAlongSurface(transform.position, transform.forward, worldConfig.surfaceRadius, arc);
     }
 
-    // 법선(up) 갱신 — CameraRig 도 이 값을 읽는다.
     transform.up.copy(transform.position).normalize();
 
     const group = groupRef.current;
     if (!group) return;
 
-    // 이동 중 bobbing (reduce motion 이면 생략).
+    // bobbing (reduce motion 이면 생략).
     const moving = moveDir !== 0 && !reduceMotion;
     if (moving) bobPhase.current += delta * 9;
     const bobTarget = moving ? Math.sin(bobPhase.current) * 0.03 : 0;
     bob.current = MathUtils.lerp(bob.current, bobTarget, 1 - Math.exp(-10 * delta));
 
-    // 위치: 표면 위 + bobbing 오프셋(up 방향)
     group.position.copy(transform.position).addScaledVector(transform.up, bob.current);
 
-    // 방향: 로컬 +Y = up, +Z = forward 가 되도록 정규직교 기저로 회전 설정.
-    _right.copy(transform.up).cross(transform.forward).normalize(); // up × forward
+    // 방향: 로컬 +Y = up, +Z = forward.
+    _right.copy(transform.up).cross(transform.forward).normalize();
     _basis.makeBasis(_right, transform.up, transform.forward);
     _quat.setFromRotationMatrix(_basis);
     group.quaternion.copy(_quat);
+
+    // 그림자는 캐릭터 bobbing 을 상쇄해 표면에 고정.
+    if (shadowRef.current) {
+      shadowRef.current.position.y = -worldConfig.playerHeight - bob.current + 0.02;
+    }
   });
 
   return (
     <group ref={groupRef}>
-      {/* 몸통 — 로컬 +Y(=표면 위)로 선 캡슐 */}
-      <mesh>
-        <capsuleGeometry args={[0.16, 0.26, 6, 16]} />
-        <meshStandardMaterial color="#f6d68c" roughness={0.6} />
+      {/* 발밑 그림자 (bobbing 상쇄됨) */}
+      <ShadowBlob ref={shadowRef} radius={0.3} opacity={0.9} />
+
+      {/* 몸통 — 살짝 눌린 둥근 구 */}
+      <mesh scale={[1, 0.9, 1.05]}>
+        <sphereGeometry args={[0.2, 18, 16]} />
+        <meshStandardMaterial color={FUR} roughness={0.7} />
       </mesh>
-      {/* 코 — 로컬 +Z(=진행 방향)를 가리키는 작은 원뿔로 방향을 보여준다. */}
-      <mesh position={[0, 0.04, 0.18]} rotation={[Math.PI / 2, 0, 0]}>
-        <coneGeometry args={[0.07, 0.14, 12]} />
-        <meshStandardMaterial color="#e2952f" roughness={0.5} />
+      {/* 가슴/배 — 크림색 패치 */}
+      <mesh position={[0, -0.02, 0.13]}>
+        <sphereGeometry args={[0.12, 16, 14]} />
+        <meshStandardMaterial color={CREAM} roughness={0.75} />
       </mesh>
+
+      {/* 머리 */}
+      <mesh position={[0, 0.13, 0.12]}>
+        <sphereGeometry args={[0.145, 18, 16]} />
+        <meshStandardMaterial color={FUR} roughness={0.7} />
+      </mesh>
+      {/* 주둥이 */}
+      <mesh position={[0, 0.09, 0.24]}>
+        <sphereGeometry args={[0.07, 14, 12]} />
+        <meshStandardMaterial color={CREAM} roughness={0.75} />
+      </mesh>
+      {/* 코 */}
+      <mesh position={[0, 0.1, 0.305]}>
+        <sphereGeometry args={[0.025, 10, 10]} />
+        <meshStandardMaterial color={DARK} roughness={0.4} />
+      </mesh>
+      {/* 눈 */}
+      <mesh position={[0.06, 0.16, 0.235]}>
+        <sphereGeometry args={[0.023, 10, 10]} />
+        <meshStandardMaterial color={DARK} roughness={0.3} />
+      </mesh>
+      <mesh position={[-0.06, 0.16, 0.235]}>
+        <sphereGeometry args={[0.023, 10, 10]} />
+        <meshStandardMaterial color={DARK} roughness={0.3} />
+      </mesh>
+
+      {/* 귀 — 위로 선 원뿔, 살짝 바깥쪽으로 */}
+      <mesh position={[0.085, 0.27, 0.1]} rotation={[0, 0, -0.25]}>
+        <coneGeometry args={[0.055, 0.13, 12]} />
+        <meshStandardMaterial color={FUR} roughness={0.7} />
+      </mesh>
+      <mesh position={[-0.085, 0.27, 0.1]} rotation={[0, 0, 0.25]}>
+        <coneGeometry args={[0.055, 0.13, 12]} />
+        <meshStandardMaterial color={FUR} roughness={0.7} />
+      </mesh>
+
+      {/* 꼬리 — 뒤로 올라가는 구 3개(끝은 크림) */}
+      <mesh position={[0, 0.02, -0.2]}>
+        <sphereGeometry args={[0.085, 14, 12]} />
+        <meshStandardMaterial color={FUR} roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.1, -0.27]}>
+        <sphereGeometry args={[0.065, 14, 12]} />
+        <meshStandardMaterial color={FUR} roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.18, -0.31]}>
+        <sphereGeometry args={[0.05, 12, 12]} />
+        <meshStandardMaterial color={CREAM} roughness={0.75} />
+      </mesh>
+
+      {/* 발 — 짧은 원기둥 4개 (바닥이 표면에 닿음) */}
+      {(
+        [
+          [0.1, 0.08],
+          [-0.1, 0.08],
+          [0.1, -0.08],
+          [-0.1, -0.08],
+        ] as const
+      ).map(([x, z], i) => (
+        <mesh key={i} position={[x, -0.16, z]}>
+          <cylinderGeometry args={[0.045, 0.045, 0.12, 10]} />
+          <meshStandardMaterial color={FUR_DARK} roughness={0.75} />
+        </mesh>
+      ))}
     </group>
   );
 }

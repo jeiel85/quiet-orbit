@@ -6,6 +6,7 @@ import CameraRig from "@/components/player/CameraRig";
 import MessageOrbGroup from "@/components/world/MessageOrbGroup";
 import Decorations from "@/components/world/Decorations";
 import { worldConfig } from "@/config/worldConfig";
+import { theme } from "@/config/theme";
 import type { PlayerTransform } from "@/types/world";
 
 /**
@@ -26,8 +27,13 @@ export default function Scene() {
 
   return (
     <>
-      <ambientLight intensity={0.7} />
-      <directionalLight position={[5, 8, 5]} intensity={1.1} />
+      {/* 먼 가장자리를 하늘색으로 살짝 흐려 깊이감 (가까운 플레이어엔 영향 없음). */}
+      <fog attach="fog" args={[theme.sky, 9, 24]} />
+
+      {/* 하늘(위)·따뜻한 땅(아래) 톤의 부드러운 채움광 + 약한 ambient + 따뜻한 key. */}
+      <hemisphereLight args={["#dbeef6", "#e9d8b8", 0.85]} />
+      <ambientLight intensity={0.3} />
+      <directionalLight position={[6, 9, 4]} intensity={1.0} color="#fff3df" />
 
       <Planet />
       <Decorations />

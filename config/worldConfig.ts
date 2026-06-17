@@ -2,8 +2,9 @@
 // 수치를 바꿔도 컴포넌트 코드는 그대로 — Goal 2 이동·카메라 감각을 여기서 조정한다.
 
 const planetRadius = 3;
-// 플레이어 중심이 행성 표면에서 떠 있는 높이. 아바타 절반 높이와 맞춰 바닥이 표면에 닿게 한다.
-const playerHeight = 0.3;
+// 플레이어 group 원점이 표면에서 떠 있는 높이 = 둥근 캐릭터의 중심~발 거리.
+// 이 값만큼 아래(로컬 -Y)에 발이 닿도록 아바타를 구성한다.
+const playerHeight = 0.22;
 
 export const worldConfig = {
   planetRadius,
