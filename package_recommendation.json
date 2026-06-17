@@ -1,0 +1,21 @@
+{
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "three": "latest",
+    "@react-three/fiber": "latest",
+    "@react-three/drei": "latest",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "typescript": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/three": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest"
+  },
+  "note": "실제 package.json 생성 시에는 최신 major 호환성을 확인하고 lockfile을 커밋하세요. @react-three/fiber는 React major version과 호환되는 major를 사용해야 합니다."
+}
