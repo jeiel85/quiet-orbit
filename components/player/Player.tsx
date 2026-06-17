@@ -43,6 +43,8 @@ interface PlayerProps {
  * - reduce motion 이면 모든 모션 정지.
  */
 export default function Player({ transform }: PlayerProps) {
+  // 가짜 그림자는 모바일에서만(데스크톱은 실시간 그림자). 렌더 시점 분기용 reactive 구독.
+  const isTouch = useSettingsStore((s) => s.isTouch);
   const groupRef = useRef<Group>(null); // 월드 위치/방향 + 바운스
   const rigRef = useRef<Group>(null); // 회전 기울임(roll/pitch)
   const tailRef = useRef<Group>(null); // 꼬리 스윙
@@ -140,8 +142,8 @@ export default function Player({ transform }: PlayerProps) {
 
   return (
     <group ref={groupRef}>
-      {/* 발밑 그림자 (바운스 상쇄, rig 기울임 영향 안 받게 group 직속) */}
-      <ShadowBlob ref={shadowRef} radius={0.3} opacity={0.9} />
+      {/* 발밑 가짜 그림자 — 모바일 전용(바운스 상쇄, rig 기울임 영향 안 받게 group 직속) */}
+      {isTouch && <ShadowBlob ref={shadowRef} radius={0.3} opacity={0.9} />}
 
       {/* 움직이는 몸체 리그 — 기울임/스윙은 모두 이 안에서 */}
       <group ref={rigRef}>

@@ -11,7 +11,7 @@ const LOCAL_UP = new Vector3(0, 1, 0);
 
 const FLOWER_PETAL = ["#f4a6c0", "#fdfbf6", "#c9b8ee"]; // variant 별 꽃잎 색
 
-function Tree({ phase }: { phase: number }) {
+function Tree({ phase, blob }: { phase: number; blob: boolean }) {
   const foliage = useRef<Group>(null);
   useFrame((state) => {
     if (useSettingsStore.getState().reduceMotion) return;
@@ -24,7 +24,7 @@ function Tree({ phase }: { phase: number }) {
 
   return (
     <group>
-      <ShadowBlob radius={0.32} />
+      {blob && <ShadowBlob radius={0.32} />}
       {/* 줄기 */}
       <mesh position={[0, 0.1, 0]}>
         <cylinderGeometry args={[0.04, 0.055, 0.2, 6]} />
@@ -49,10 +49,10 @@ function Tree({ phase }: { phase: number }) {
   );
 }
 
-function Rock() {
+function Rock({ blob }: { blob: boolean }) {
   return (
     <group>
-      <ShadowBlob radius={0.26} />
+      {blob && <ShadowBlob radius={0.26} />}
       <mesh position={[0, 0.07, 0]}>
         <icosahedronGeometry args={[0.13, 0]} />
         <meshStandardMaterial color="#9aa7a8" flatShading roughness={0.95} />
@@ -69,10 +69,10 @@ function Rock() {
   );
 }
 
-function House() {
+function House({ blob }: { blob: boolean }) {
   return (
     <group>
-      <ShadowBlob radius={0.34} />
+      {blob && <ShadowBlob radius={0.34} />}
       {/* 본체 */}
       <mesh position={[0, 0.11, 0]}>
         <boxGeometry args={[0.26, 0.22, 0.26]} />
@@ -137,20 +137,28 @@ function Flower({ variant = 0, phase }: { variant?: number; phase: number }) {
   );
 }
 
-function renderKind(decoration: Decoration, phase: number) {
+function renderKind(decoration: Decoration, phase: number, blob: boolean) {
   switch (decoration.kind) {
     case "tree":
-      return <Tree phase={phase} />;
+      return <Tree phase={phase} blob={blob} />;
     case "rock":
-      return <Rock />;
+      return <Rock blob={blob} />;
     case "house":
-      return <House />;
+      return <House blob={blob} />;
     case "flower":
       return <Flower variant={decoration.variant} phase={phase} />;
   }
 }
 
-function DecorationItem({ decoration, index }: { decoration: Decoration; index: number }) {
+function DecorationItem({
+  decoration,
+  index,
+  blob,
+}: {
+  decoration: Decoration;
+  index: number;
+  blob: boolean;
+}) {
   const { position, quaternion } = useMemo(() => {
     const pos = sphericalToWorld(decoration.theta, decoration.phi, worldConfig.planetRadius);
     const up = pos.clone().normalize();
@@ -161,17 +169,26 @@ function DecorationItem({ decoration, index }: { decoration: Decoration; index: 
 
   return (
     <group position={position} quaternion={quaternion} scale={decoration.scale ?? 1}>
-      {renderKind(decoration, index * 1.3)}
+      {renderKind(decoration, index * 1.3, blob)}
     </group>
   );
 }
 
-/** 행성 표면 장식 — 나무/꽃은 바람에 흔들리고, 돌/집은 정적. */
+/**
+ * 행성 표면 장식 — 나무/꽃은 바람에 흔들리고, 돌/집은 정적.
+ * 가짜 그림자(blob)는 모바일에서만(데스크톱은 실시간 그림자가 처리).
+ */
 export default function Decorations() {
+  const isTouch = useSettingsStore((s) => s.isTouch);
   return (
     <>
       {decorations.map((decoration, i) => (
-        <DecorationItem key={`${decoration.kind}-${i}`} decoration={decoration} index={i} />
+        <DecorationItem
+          key={`${decoration.kind}-${i}`}
+          decoration={decoration}
+          index={i}
+          blob={isTouch}
+        />
       ))}
     </>
   );
