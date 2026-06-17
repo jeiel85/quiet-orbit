@@ -34,7 +34,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Implementation Order
 1. Scaffold + 전체화면 Canvas — ✅ 완료
-2. Planet + Player + CameraRig
+2. Planet + Player + CameraRig — ✅ 완료
 3. Message Orb + 상호작용 UI + localStorage
 4. 모바일 조작 + 비주얼 폴리싱 + 성능
 5. Vercel 배포 정리 + 온라인 확장 훅
