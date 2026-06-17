@@ -29,7 +29,7 @@ export default function Experience() {
       <div className="pointer-events-none absolute inset-0 select-none">
         <header className="absolute left-5 top-5">
           <p className="text-xs uppercase tracking-[0.3em] text-[color:var(--color-text)] opacity-60">
-            Yoonseul Planet
+            Quiet Orbit
           </p>
         </header>
       </div>

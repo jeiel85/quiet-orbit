@@ -1,0 +1,24 @@
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="32%" r="80%">
+      <stop offset="0%" stop-color="#eaf7fa"/>
+      <stop offset="100%" stop-color="#bdeaf2"/>
+    </radialGradient>
+    <radialGradient id="planet" cx="38%" cy="34%" r="72%">
+      <stop offset="0%" stop-color="#d2ebcc"/>
+      <stop offset="100%" stop-color="#a9d2b3"/>
+    </radialGradient>
+    <radialGradient id="orb" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffeec2"/>
+      <stop offset="100%" stop-color="#f7c76b"/>
+    </radialGradient>
+  </defs>
+  <rect width="64" height="64" rx="15" fill="url(#bg)"/>
+  <g transform="translate(32 34) rotate(-18)">
+    <ellipse rx="23" ry="9.5" fill="none" stroke="#7293a0" stroke-opacity="0.5" stroke-width="2"/>
+    <circle r="11.5" fill="url(#planet)"/>
+    <circle r="11.5" fill="#25323a" fill-opacity="0.06"/>
+    <circle cx="23" cy="0" r="4.6" fill="url(#orb)"/>
+    <circle cx="23" cy="0" r="7.5" fill="#f7c76b" fill-opacity="0.25"/>
+  </g>
+</svg>

@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Quiet Orbit — 조용한 행성 산책</title>
+    <meta
+      name="description"
+      content="작은 행성 위를 천천히 산책하며 빛나는 메시지 조각을 발견하는 조용한 3D 웹 경험."
+    />
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#bdeaf2" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Quiet Orbit" />
+    <meta
+      property="og:description"
+      content="작은 행성 위를 천천히 산책하며 빛나는 메시지 조각을 발견하는 조용한 3D 웹 경험."
+    />
+    <meta
+      property="og:image"
+      content="https://jeiel85.github.io/messenger-planet-web/preview.png"
+    />
+    <meta property="og:url" content="https://jeiel85.github.io/messenger-planet-web/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Quiet Orbit" />
+    <meta
+      name="twitter:image"
+      content="https://jeiel85.github.io/messenger-planet-web/preview.png"
+    />
+
+    <style>
+      :root {
+        --background: #eaf7fa;
+        --sky: #bdeaf2;
+        --sky-soft: #cfe8f7;
+        --ground: #a3cead;
+        --ground-soft: #d2ebcc;
+        --accent: #f7c76b;
+        --accent-soft: #ffeec2;
+        --text: #25323a;
+        --muted: #5d6e76;
+        --shadow: #7293a0;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+        color: var(--text);
+        background: linear-gradient(180deg, var(--background) 0%, var(--sky) 100%);
+        line-height: 1.7;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero {
+        min-height: 78vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 28px;
+        padding: 72px 24px 48px;
+      }
+
+      .scene {
+        perspective: 900px;
+        width: 240px;
+        height: 240px;
+        display: grid;
+        place-items: center;
+      }
+
+      .system {
+        position: relative;
+        width: 240px;
+        height: 240px;
+        display: grid;
+        place-items: center;
+        transform-style: preserve-3d;
+        transform: rotateX(66deg);
+      }
+
+      .planet {
+        position: absolute;
+        width: 96px;
+        height: 96px;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at 36% 30%,
+          var(--ground-soft),
+          var(--ground)
+        );
+        box-shadow: inset -8px -10px 22px rgba(37, 50, 58, 0.12);
+        transform: rotateX(-66deg); /* keep the planet facing the viewer */
+      }
+
+      .orbit {
+        position: absolute;
+        border: 1.5px solid rgba(114, 147, 160, 0.4);
+        border-radius: 50%;
+      }
+
+      .orbit-1 {
+        width: 170px;
+        height: 170px;
+        animation: spin 14s linear infinite;
+      }
+      .orbit-2 {
+        width: 230px;
+        height: 230px;
+        border-color: rgba(114, 147, 160, 0.28);
+        animation: spin 22s linear infinite reverse;
+      }
+
+      .orb {
+        position: absolute;
+        top: -7px;
+        left: 50%;
+        width: 14px;
+        height: 14px;
+        margin-left: -7px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 50% 45%, var(--accent-soft), var(--accent));
+        box-shadow: 0 0 0 7px rgba(247, 199, 107, 0.22);
+      }
+      .orbit-2 .orb {
+        width: 10px;
+        height: 10px;
+        margin-left: -5px;
+        top: -5px;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .orbit-1,
+        .orbit-2 {
+          animation: none;
+        }
+      }
+
+      .title {
+        font-size: clamp(44px, 9vw, 76px);
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        margin: 0;
+      }
+
+      .tagline {
+        font-size: clamp(16px, 3.4vw, 20px);
+        color: var(--muted);
+        margin: 0;
+        max-width: 30ch;
+      }
+
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 6px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 22px;
+        border-radius: 999px;
+        font-size: 15px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+      .btn-primary {
+        background: var(--text);
+        color: var(--background);
+      }
+      .btn-primary:hover {
+        background: #16222a;
+      }
+      .btn-ghost {
+        background: rgba(255, 255, 255, 0.55);
+        color: var(--text);
+        border: 1px solid rgba(114, 147, 160, 0.35);
+      }
+      .btn-ghost:hover {
+        border-color: rgba(114, 147, 160, 0.6);
+      }
+
+      /* ---------- Sections ---------- */
+      section {
+        padding: 40px 0;
+      }
+
+      h2 {
+        font-size: 22px;
+        margin: 0 0 8px;
+      }
+
+      .lead {
+        color: var(--muted);
+        margin: 0 0 28px;
+      }
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      .card {
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid rgba(114, 147, 160, 0.22);
+        border-radius: 18px;
+        padding: 20px;
+      }
+      .card h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+      }
+      .card p {
+        margin: 0;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .note {
+        font-size: 13px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.45);
+        border: 1px dashed rgba(114, 147, 160, 0.35);
+        border-radius: 14px;
+        padding: 14px 18px;
+      }
+
+      footer {
+        text-align: center;
+        padding: 40px 24px 64px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      footer a {
+        color: var(--shadow);
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="scene" aria-hidden="true">
+        <div class="system">
+          <div class="orbit orbit-2"><span class="orb"></span></div>
+          <div class="orbit orbit-1"><span class="orb"></span></div>
+          <div class="planet"></div>
+        </div>
+      </div>
+      <h1 class="title">Quiet Orbit</h1>
+      <p class="tagline">작은 행성을 천천히 걷다가, 빛나는 메시지 하나를 발견하는 곳.</p>
+      <nav class="cta">
+        <a class="btn btn-primary" href="https://github.com/jeiel85/messenger-planet-web">
+          GitHub에서 보기
+        </a>
+        <a class="btn btn-ghost" href="https://github.com/jeiel85/messenger-planet-web/tree/main/docs/design">
+          설계 문서 읽기
+        </a>
+      </nav>
+    </header>
+
+    <main class="wrap">
+      <section>
+        <h2>무엇인가요</h2>
+        <p class="lead">
+          Quiet Orbit은 경쟁도 점수도 없는 조용한 3D 웹 산책입니다. 작은 구형 행성 위를
+          걸으며 곳곳에 놓인 빛나는 메시지 조각(Orb)에 다가가 짧은 글을 읽습니다. 1분 남짓
+          머물며 따뜻한 흔적을 발견하고 떠나는 경험을 지향합니다.
+        </p>
+        <div class="cards">
+          <div class="card">
+            <h3>🌍 작은 행성 산책</h3>
+            <p>구면 위를 부드럽게 이동하고, 3인칭 카메라가 천천히 따라옵니다.</p>
+          </div>
+          <div class="card">
+            <h3>✨ 빛나는 메시지</h3>
+            <p>행성 곳곳의 Orb에 가까이 가면 짧은 메시지를 열어볼 수 있습니다.</p>
+          </div>
+          <div class="card">
+            <h3>📱 모바일 &amp; 데스크톱</h3>
+            <p>키보드와 터치 조이스틱을 모두 지원하는 가벼운 반응형 경험.</p>
+          </div>
+          <div class="card">
+            <h3>🔒 계정 없이</h3>
+            <p>로그인도 서버도 없이, 읽은 메시지는 브라우저에 조용히 저장됩니다.</p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>기술</h2>
+        <p class="lead">
+          Next.js (App Router) · TypeScript · Three.js · React Three Fiber · drei ·
+          zustand · Tailwind CSS · Vercel 배포를 목표로 합니다.
+        </p>
+        <p class="note">
+          🚧 인터랙티브 데모는 준비 중입니다. 현재는 개발 초기 단계(Goal 1 완료)이며,
+          진행 상황은 GitHub 저장소에서 확인할 수 있습니다.
+        </p>
+      </section>
+    </main>
+
+    <footer>
+      <p>
+        고품질 브라우저 3D 경험에서 <em>감성적 구조</em>만 벤치마킹한 독립 프로젝트입니다.
+        특정 사이트의 브랜드·캐릭터·에셋·맵·텍스트를 복제하지 않습니다.
+      </p>
+      <p>
+        <a href="https://github.com/jeiel85/messenger-planet-web">github.com/jeiel85/messenger-planet-web</a>
+      </p>
+    </footer>
+  </body>
+</html>

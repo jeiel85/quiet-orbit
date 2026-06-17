@@ -4,7 +4,7 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
-# Yoonseul Planet — Agent Working Rules
+# Quiet Orbit — Agent Working Rules
 
 작은 행성 위를 산책하며 빛나는 메시지 Orb 를 발견하는 스탠드얼론 감성 3D WebGL 웹사이트.
 전체 설계 묶음은 `docs/design/` 참고 — 시작점은 `docs/design/README.md`,
