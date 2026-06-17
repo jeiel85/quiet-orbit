@@ -4,6 +4,7 @@ import { Group, MathUtils, Matrix4, Quaternion, Vector3 } from "three";
 import { useKeyboardInput } from "@/components/controls/useKeyboardInput";
 import { moveAlongSurface, turn } from "@/lib/math/sphericalMovement";
 import { worldConfig } from "@/config/worldConfig";
+import { useGameStore } from "@/store/useGameStore";
 import type { PlayerTransform } from "@/types/world";
 
 // 프레임마다 재사용하는 임시값 (할당 없음).
@@ -31,7 +32,11 @@ export default function Player({ transform }: PlayerProps) {
   useFrame((_, rawDelta) => {
     // 탭 복귀 직후 큰 delta 로 순간이동하는 것을 방지.
     const delta = Math.min(rawDelta, 0.05);
-    const { forward: moveDir, turn: turnDir } = input.current;
+
+    // 메시지 패널이 열려 있으면 이동 비활성화 (gameplay 문서 규칙).
+    const panelOpen = useGameStore.getState().openedMessageId !== null;
+    const moveDir = panelOpen ? 0 : input.current.forward;
+    const turnDir = panelOpen ? 0 : input.current.turn;
 
     // 좌우 회전 (D = 우회전). 부호가 반대로 느껴지면 여기 부호만 뒤집으면 된다.
     turn(transform.forward, transform.up, -turnDir * worldConfig.turnSpeed * delta);

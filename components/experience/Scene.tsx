@@ -3,6 +3,7 @@ import { Vector3 } from "three";
 import Planet from "@/components/world/Planet";
 import Player from "@/components/player/Player";
 import CameraRig from "@/components/player/CameraRig";
+import MessageOrbGroup from "@/components/world/MessageOrbGroup";
 import { worldConfig } from "@/config/worldConfig";
 import type { PlayerTransform } from "@/types/world";
 
@@ -28,6 +29,7 @@ export default function Scene() {
       <directionalLight position={[5, 8, 5]} intensity={1.1} />
 
       <Planet />
+      <MessageOrbGroup transform={playerTransform} />
       <Player transform={playerTransform} />
       <CameraRig transform={playerTransform} />
     </>

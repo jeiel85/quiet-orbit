@@ -15,8 +15,14 @@ export const worldConfig = {
   moveSpeed: 1.6, // 표면을 따라가는 속도 (units/sec)
   turnSpeed: 2.0, // 좌우 회전 속도 (rad/sec)
 
-  // 상호작용 (Goal 3 에서 사용)
+  // 상호작용 (Goal 3)
   interactionRadius: 0.55,
+
+  // 메시지 Orb
+  orb: {
+    heightOffset: 0.42, // 행성 표면 위로 띄우는 기본 높이
+    radius: 0.17, // Orb 지오메트리 반지름
+  },
 
   // 3인칭 추적 카메라
   camera: {

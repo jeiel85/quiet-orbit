@@ -4,6 +4,9 @@ import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
 import Scene from "./Scene";
 import { theme } from "@/config/theme";
+import { useInteractionKeys } from "@/components/controls/useInteractionKeys";
+import InteractionHint from "@/components/ui/InteractionHint";
+import MessagePanel from "@/components/ui/MessagePanel";
 
 /**
  * 전체 화면 WebGL Canvas + UI 오버레이 레이어.
@@ -11,6 +14,9 @@ import { theme } from "@/config/theme";
  * - UI 레이어: Canvas 위에 absolute 로 얹는 HTML (이후 인트로/힌트/메시지 패널 자리)
  */
 export default function Experience() {
+  // Space/Enter 로 메시지 열기, Esc 로 닫기.
+  useInteractionKeys();
+
   return (
     <div className="fixed inset-0">
       <Canvas
@@ -32,7 +38,12 @@ export default function Experience() {
             Quiet Orbit
           </p>
         </header>
+
+        <InteractionHint />
       </div>
+
+      {/* 메시지 패널 — 자체적으로 pointer-events 를 켠다(배경/버튼 클릭). */}
+      <MessagePanel />
     </div>
   );
 }
