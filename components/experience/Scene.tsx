@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Environment, Lightformer, Sparkles, SoftShadows } from "@react-three/drei";
+import { Environment, Lightformer, Sparkles } from "@react-three/drei";
 import Planet from "@/components/world/Planet";
 import Player from "@/components/player/Player";
 import CameraRig from "@/components/player/CameraRig";
@@ -19,7 +19,7 @@ import type { PlayerTransform } from "@/types/world";
 
 /**
  * 3D 월드의 최상위 구성 — 분위기 + 행성 + 플레이어 + 추적 카메라.
- * 데스크톱: 실시간 소프트 그림자 + 블룸 후처리. 모바일: 끄고 가짜 그림자로 대체(성능).
+ * 데스크톱: 실시간 그림자 + 블룸 후처리. 모바일: 끄고 가짜 그림자로 대체(성능).
  */
 export default function Scene() {
   const isTouch = useSettingsStore((s) => s.isTouch);
@@ -69,8 +69,7 @@ export default function Scene() {
         shadow-bias={-0.0004}
       />
 
-      {/* 데스크톱: PCSS 소프트 그림자 + 전 mesh cast/receive 활성화 */}
-      {fancy && <SoftShadows size={24} samples={12} focus={0} />}
+      {/* 데스크톱: 전 mesh cast/receive 활성화 */}
       {fancy && <EnableShadows />}
 
       {/* 떠다니는 빛 입자 — 모바일은 개수를 줄인다. */}
