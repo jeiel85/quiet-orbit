@@ -125,9 +125,6 @@ vercel --prod   # production 배포
 
 - 플레이어 캐릭터(작은 여행자)와 여우 컴패니언은 모두 **직접 제작한 primitive 지오메트리**입니다 —
   외부 모델을 쓰지 않습니다.
-- `public/models/Fox.glb` 는 더 이상 사용하지 않습니다(초기 버전의 GLB 아바타). 파일이 남아 있는 동안의
-  출처 표기: *Fox* by **PixelMannen** (메시 CC0), 리깅·애니메이션 by **@tomkranis** (CC BY 4.0),
-  glTF 변환 by **@AsoboStudio** & **@scurest** — Khronos glTF-Sample-Assets.
 
 ## 라이선스 · 출처
 
