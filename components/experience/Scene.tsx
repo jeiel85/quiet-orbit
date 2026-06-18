@@ -78,7 +78,7 @@ export default function Scene() {
       />
 
       <Planet />
-      <Decorations />
+      <Decorations transform={playerTransform} />
       <MessageOrbGroup transform={playerTransform} />
       <Player transform={playerTransform} />
       <CameraRig transform={playerTransform} />

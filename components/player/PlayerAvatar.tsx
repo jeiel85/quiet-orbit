@@ -1,20 +1,13 @@
-import { Suspense, type RefObject } from "react";
+import { type RefObject } from "react";
 import { type AvatarAnimState } from "@/lib/player/avatarAnim";
-import ModelErrorBoundary from "./ModelErrorBoundary";
-import PrimitiveFox from "./PrimitiveFox";
-import FoxModel from "./FoxModel";
+import PrimitivePrince from "./PrimitivePrince";
 
 /**
- * 플레이어 아바타 — GLB 여우를 우선 시도하고, 로딩 중/실패 시 primitive 여우로 폴백.
- * 둘 다 공유 anim 상태를 읽어 같은 컨트롤러(Player)에 반응한다.
+ * 플레이어 아바타 — 행성을 거니는 어린왕자(primitive).
+ * 공유 anim 상태(Player 컨트롤러가 매 프레임 갱신)를 읽어 걷기/기울임/스카프를 구동한다.
+ *
+ * 참고: 여우는 어린왕자의 컴패니언으로 행성 위(config/decorations.ts 의 "fox")에 머문다.
  */
 export default function PlayerAvatar({ anim }: { anim: RefObject<AvatarAnimState> }) {
-  const fallback = <PrimitiveFox anim={anim} />;
-  return (
-    <ModelErrorBoundary fallback={fallback}>
-      <Suspense fallback={fallback}>
-        <FoxModel anim={anim} />
-      </Suspense>
-    </ModelErrorBoundary>
-  );
+  return <PrimitivePrince anim={anim} />;
 }
