@@ -120,7 +120,14 @@ vercel --prod   # production 배포
 - **WebSocket**: 후속에 실시간 멀티플레이가 필요하면 Vercel 은 프론트 배포로 두고, WebSocket 계층은 PartyKit/Supabase Realtime 등 별도 서비스로 분리합니다.
 - **배포 전 체크**: `npm run build` / `npm run lint` 통과, 모바일 viewport, localStorage 오류 처리, WebGL 정상 실행.
 
+## 크레딧 (외부 에셋)
+
+- **플레이어 캐릭터** `public/models/Fox.glb` — *Fox* by **PixelMannen** (메시 CC0),
+  리깅·애니메이션 by **@tomkranis** (CC BY 4.0), glTF 변환 by **@AsoboStudio** & **@scurest**.
+  출처: Khronos glTF-Sample-Assets. (로드 실패 시 primitive 여우로 폴백)
+
 ## 라이선스 · 출처
 
-이 저장소의 코드와 비주얼 자산은 직접 제작한 것이며, 벤치마킹 대상 사이트의 어떤 저작물도
-포함하지 않습니다. 자세한 작업 규칙은 [`AGENTS.md`](AGENTS.md) 를 참고하세요.
+이 저장소의 코드와 직접 제작한 비주얼 자산은 벤치마킹 대상 사이트의 어떤 저작물도
+포함하지 않습니다. 외부 3D 에셋은 위 *크레딧* 의 라이선스를 따릅니다. 자세한 작업 규칙은
+[`AGENTS.md`](AGENTS.md) 를 참고하세요.
