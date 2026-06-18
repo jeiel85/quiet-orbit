@@ -20,7 +20,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Hard Constraints
 - MVP 에 멀티플레이 / 로그인 / 유료 API / 분석 SDK 를 넣지 않는다.
-- messenger.abeto.co 의 브랜드·에셋·캐릭터·UI·맵·텍스트를 복제하지 않는다.
+- 원본(messenger.abeto.co)의 경험 구조·인터랙션·레이아웃·분위기는 **자유롭게 참조**한다(영감 환영).
+  다만 브랜드명·로고·상표, 실제 에셋(3D 모델·텍스처·일러스트), UI 그래픽, 원문 텍스트의
+  **그대로 복제(verbatim)** 만 피한다 — 취향이 아니라 저작권·상표 리스크 회피선.
 - 3D 경험은 클라이언트 전용으로 유지한다(서버 런타임 의존 금지).
 - Vercel 에 배포 가능한 상태를 유지한다.
 
