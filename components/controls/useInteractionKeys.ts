@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { getTravelSpot } from "@/config/planets";
 import { useGameStore } from "@/store/useGameStore";
 
 /**
@@ -12,12 +13,18 @@ export function useInteractionKeys(): void {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === " " || e.key === "Enter") {
-        const { activeMessageId, openedMessageId, openMessage, closeMessage } =
+        const { activeMessageId, activeTravelSpotId, openedMessageId, travel, openMessage, closeMessage, beginTravel } =
           useGameStore.getState();
+        if (travel !== null) return;
         if (openedMessageId !== null) {
           // 패널이 열려 있으면 Space/Enter 로 닫는다.
           e.preventDefault();
           closeMessage();
+        } else if (activeTravelSpotId) {
+          const spot = getTravelSpot(activeTravelSpotId);
+          if (!spot) return;
+          e.preventDefault();
+          beginTravel(spot);
         } else if (activeMessageId) {
           e.preventDefault();
           openMessage(activeMessageId);

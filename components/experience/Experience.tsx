@@ -10,6 +10,7 @@ import InteractionHint from "@/components/ui/InteractionHint";
 import IntroOverlay from "@/components/ui/IntroOverlay";
 import MessagePanel from "@/components/ui/MessagePanel";
 import MobileJoystick from "@/components/controls/MobileJoystick";
+import TravelOverlay from "@/components/ui/TravelOverlay";
 
 /**
  * 전체 화면 WebGL Canvas + UI 오버레이 레이어.
@@ -53,6 +54,7 @@ export default function Experience() {
       {/* 자체적으로 pointer-events 를 켜는 인터랙티브 요소들. */}
       <MobileJoystick />
       <MessagePanel />
+      <TravelOverlay />
       <IntroOverlay />
     </div>
   );

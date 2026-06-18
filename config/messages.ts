@@ -117,4 +117,82 @@ export const messages: Message[] = [
     position: { theta: 6.0, phi: 1.7 },
     tone: "warm",
   },
+
+  // 새벽 편지별
+  {
+    id: "paper-boat",
+    planetId: "dawn",
+    title: "종이배",
+    body: "가벼운 마음도 물살을 만나면 꽤 멀리 가요. 오늘의 작은 문장 하나를 띄워 보세요.",
+    position: { theta: 0.95, phi: 1.55 },
+    tone: "quiet",
+  },
+  {
+    id: "wind-note",
+    planetId: "dawn",
+    title: "바람의 쪽지",
+    body: "답장이 늦어도 마음이 늦은 건 아닐 거예요. 어떤 말들은 천천히 도착하니까요.",
+    position: { theta: 3.1, phi: 1.08 },
+    tone: "memory",
+  },
+  {
+    id: "soft-harbor",
+    planetId: "dawn",
+    title: "부드러운 항구",
+    body: "잠시 머무르는 곳도 목적지가 될 수 있어요. 쉬어 가도 길은 사라지지 않습니다.",
+    position: { theta: 5.05, phi: 2.0 },
+    tone: "warm",
+  },
+
+  // 붉은 먼지별
+  {
+    id: "warm-crater",
+    planetId: "ember",
+    title: "따뜻한 분화구",
+    body: "식어 가는 것처럼 보여도 안쪽에는 오래 남은 온기가 있어요. 당신에게도 그런 빛이 있습니다.",
+    position: { theta: 0.95, phi: 1.7 },
+    tone: "warm",
+  },
+  {
+    id: "crystal-map",
+    planetId: "ember",
+    title: "수정 지도",
+    body: "길은 늘 직선일 필요가 없어요. 반짝이는 조각을 따라 돌아가도, 결국 만나게 됩니다.",
+    position: { theta: 2.65, phi: 1.3 },
+    tone: "hope",
+  },
+  {
+    id: "red-dust",
+    planetId: "ember",
+    title: "붉은 먼지",
+    body: "먼지가 가라앉고 나면 남는 모양이 있어요. 오늘 지나간 일들도 언젠가 선명해질 거예요.",
+    position: { theta: 4.8, phi: 2.12 },
+    tone: "memory",
+  },
+
+  // 보랏빛 궤도별
+  {
+    id: "little-satellite",
+    planetId: "violet",
+    title: "작은 위성",
+    body: "혼자 도는 것처럼 보여도, 같은 중심을 바라보는 것들이 있어요. 외로움도 때로는 궤도입니다.",
+    position: { theta: 0.8, phi: 1.62 },
+    tone: "quiet",
+  },
+  {
+    id: "telescope-night",
+    planetId: "violet",
+    title: "망원경의 밤",
+    body: "멀리 있는 빛을 보려면 어둠도 필요해요. 지금의 밤이 전부 어둠만은 아닐 거예요.",
+    position: { theta: 2.35, phi: 1.05 },
+    tone: "hope",
+  },
+  {
+    id: "orbit-letter",
+    planetId: "violet",
+    title: "궤도 위 편지",
+    body: "돌고 돌아 다시 만나는 말들이 있어요. 오래된 다정함은 길을 잃지 않습니다.",
+    position: { theta: 5.2, phi: 1.85 },
+    tone: "memory",
+  },
 ];

@@ -1,20 +1,21 @@
 import { useMemo } from "react";
-import { Vector3 } from "three";
 import { Environment, Lightformer, Sparkles, SoftShadows } from "@react-three/drei";
 import Planet from "@/components/world/Planet";
 import Player from "@/components/player/Player";
 import CameraRig from "@/components/player/CameraRig";
 import MessageOrbGroup from "@/components/world/MessageOrbGroup";
 import Decorations from "@/components/world/Decorations";
+import TravelSpotGroup from "@/components/world/TravelSpotGroup";
+import TravelTransition from "@/components/world/TravelTransition";
 import GradientBackground from "./GradientBackground";
 import EnableShadows from "./EnableShadows";
 import PostFX from "./PostFX";
+import { getPlanet, HOME_PLANET_ID } from "@/config/planets";
 import { worldConfig } from "@/config/worldConfig";
+import { sphericalForward, sphericalToWorld } from "@/lib/math/sphericalCoords";
+import { useGameStore } from "@/store/useGameStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import type { PlayerTransform } from "@/types/world";
-
-// 먼 가장자리가 녹아드는 포그 색 — 하늘 그라데이션 중간톤에 맞춘다.
-const FOG_COLOR = "#d4e7ea";
 
 /**
  * 3D 월드의 최상위 구성 — 분위기 + 행성 + 플레이어 + 추적 카메라.
@@ -22,21 +23,27 @@ const FOG_COLOR = "#d4e7ea";
  */
 export default function Scene() {
   const isTouch = useSettingsStore((s) => s.isTouch);
+  const activePlanetId = useGameStore((s) => s.activePlanetId);
   const fancy = !isTouch; // 그림자/후처리는 데스크톱에서만
+  const activePlanet = getPlanet(activePlanetId);
 
   const playerTransform = useMemo<PlayerTransform>(
-    () => ({
-      position: new Vector3(0, worldConfig.surfaceRadius, 0),
-      forward: new Vector3(0, 0, 1),
-      up: new Vector3(0, 1, 0),
-    }),
+    () => {
+      const start = getPlanet(HOME_PLANET_ID).startPoint;
+      const position = sphericalToWorld(start.theta, start.phi, worldConfig.surfaceRadius);
+      return {
+        position,
+        forward: sphericalForward(start.theta, start.phi, start.heading),
+        up: position.clone().normalize(),
+      };
+    },
     [],
   );
 
   return (
     <>
       <GradientBackground />
-      <fog attach="fog" args={[FOG_COLOR, 9, 26]} />
+      <fog attach="fog" args={[activePlanet.fogColor, 9, 26]} />
 
       {/* 절차적 환경광(IBL) — 외부 HDR 없이 Lightformer 로 한 번 굽는다. */}
       <Environment frames={1} resolution={256} background={false}>
@@ -80,6 +87,8 @@ export default function Scene() {
       <Planet />
       <Decorations transform={playerTransform} />
       <MessageOrbGroup transform={playerTransform} />
+      <TravelSpotGroup transform={playerTransform} />
+      <TravelTransition transform={playerTransform} />
       <Player transform={playerTransform} />
       <CameraRig transform={playerTransform} />
 

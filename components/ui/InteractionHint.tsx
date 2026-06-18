@@ -1,4 +1,5 @@
 import { messages } from "@/config/messages";
+import { getPlanet, getTravelSpot } from "@/config/planets";
 import { useGameStore } from "@/store/useGameStore";
 
 /**
@@ -7,11 +8,37 @@ import { useGameStore } from "@/store/useGameStore";
  */
 export default function InteractionHint() {
   const started = useGameStore((s) => s.started);
-  const activeId = useGameStore((s) => s.activeMessageId);
+  const activeMessageId = useGameStore((s) => s.activeMessageId);
+  const activeTravelSpotId = useGameStore((s) => s.activeTravelSpotId);
   const openedId = useGameStore((s) => s.openedMessageId);
+  const travel = useGameStore((s) => s.travel);
 
-  if (!started || !activeId || openedId) return null;
-  const message = messages.find((m) => m.id === activeId);
+  if (!started || openedId || travel) return null;
+
+  const spot = getTravelSpot(activeTravelSpotId);
+  if (spot) {
+    const target = getPlanet(spot.targetPlanetId);
+    return (
+      <div className="pointer-events-auto absolute bottom-24 left-1/2 w-[min(calc(100vw-2rem),26rem)] -translate-x-1/2">
+        <div className="flex items-center justify-between gap-3 rounded-2xl bg-[color:var(--color-text)]/88 px-4 py-3 text-sm text-[color:var(--color-background)] shadow-lg backdrop-blur-sm">
+          <div className="min-w-0">
+            <p className="truncate font-medium">{spot.label}</p>
+            <p className="mt-0.5 truncate text-xs opacity-70">{target.subtitle}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => useGameStore.getState().beginTravel(spot)}
+            className="shrink-0 rounded-full bg-[color:var(--color-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--color-text)] transition active:scale-[0.98]"
+          >
+            이동하기
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (!activeMessageId) return null;
+  const message = messages.find((m) => m.id === activeMessageId);
 
   return (
     <div className="pointer-events-none absolute bottom-24 left-1/2 -translate-x-1/2">

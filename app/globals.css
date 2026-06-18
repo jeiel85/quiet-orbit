@@ -35,3 +35,38 @@ canvas {
   display: block;
   touch-action: none;
 }
+
+.travel-warp {
+  background:
+    repeating-linear-gradient(115deg, transparent 0 42px, rgb(255 240 189 / 0.22) 43px 45px, transparent 46px 116px),
+    repeating-linear-gradient(70deg, transparent 0 62px, rgb(200 236 255 / 0.18) 63px 66px, transparent 67px 150px),
+    linear-gradient(120deg, rgb(18 26 42 / 0.94), rgb(54 43 86 / 0.88));
+  background-size: 220px 220px, 260px 260px, 100% 100%;
+  animation: travel-warp 2.6s cubic-bezier(0.18, 0.84, 0.22, 1) forwards;
+}
+
+@keyframes travel-warp {
+  0% {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: blur(8px);
+  }
+  18%,
+  82% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+    filter: blur(12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .travel-warp {
+    animation: none;
+    opacity: 0.82;
+  }
+}

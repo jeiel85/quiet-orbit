@@ -16,3 +16,18 @@ export function sphericalToWorld(theta: number, phi: number, radius: number): Ve
     radius * sinPhi * Math.sin(theta),
   );
 }
+
+/**
+ * 구면 좌표 지점의 접평면에서 진행 방향을 만든다.
+ * heading=0 은 phi 증가 방향(북극에서 남극으로), +값은 동쪽(theta 증가 방향)으로 회전한다.
+ */
+export function sphericalForward(theta: number, phi: number, heading = 0): Vector3 {
+  const east = new Vector3(-Math.sin(theta), 0, Math.cos(theta)).normalize();
+  const south = new Vector3(
+    Math.cos(phi) * Math.cos(theta),
+    -Math.sin(phi),
+    Math.cos(phi) * Math.sin(theta),
+  ).normalize();
+
+  return south.multiplyScalar(Math.cos(heading)).addScaledVector(east, Math.sin(heading)).normalize();
+}

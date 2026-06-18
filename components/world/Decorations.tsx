@@ -1,9 +1,11 @@
 import { useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { type Group, MathUtils, type Mesh, type MeshStandardMaterial, Quaternion, Vector3 } from "three";
+import { type Group, MathUtils, type MeshStandardMaterial, Quaternion, Vector3 } from "three";
 import { decorations, type Decoration } from "@/config/decorations";
+import { HOME_PLANET_ID } from "@/config/planets";
 import { worldConfig } from "@/config/worldConfig";
 import { sphericalToWorld } from "@/lib/math/sphericalCoords";
+import { useGameStore } from "@/store/useGameStore";
 import { useSettingsStore } from "@/store/useSettingsStore";
 import { createAvatarAnim } from "@/lib/player/avatarAnim";
 import type { PlayerTransform } from "@/types/world";
@@ -471,6 +473,434 @@ function FoxCompanion({ proxPosition, transform, blob }: InteractiveProps) {
   );
 }
 
+// ── 수정 클러스터 ───────────────────────────────────────────
+function Crystal({ variant = 0, phase, blob }: { variant?: number; phase: number; blob: boolean }) {
+  const group = useRef<Group>(null);
+  const colors = ["#8fe0f0", "#ffd98a", "#c9b8ee"];
+  const color = colors[variant % colors.length];
+  useFrame((state) => {
+    if (reduce()) return;
+    const g = group.current;
+    if (!g) return;
+    g.rotation.y = Math.sin(state.clock.elapsedTime * 0.8 + phase) * 0.08;
+  });
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.26} />}
+      <group ref={group}>
+        <mesh position={[0, 0.14, 0]} rotation={[0.1, 0.2, 0]}>
+          <coneGeometry args={[0.07, 0.28, 5]} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.35} roughness={0.28} toneMapped={false} flatShading />
+        </mesh>
+        <mesh position={[0.09, 0.09, -0.04]} rotation={[0.25, 0.4, -0.35]}>
+          <coneGeometry args={[0.045, 0.2, 5]} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.25} roughness={0.35} toneMapped={false} flatShading />
+        </mesh>
+        <mesh position={[-0.08, 0.08, 0.03]} rotation={[-0.2, -0.4, 0.25]}>
+          <coneGeometry args={[0.04, 0.18, 5]} />
+          <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.22} roughness={0.35} toneMapped={false} flatShading />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ── 망원경 ─────────────────────────────────────────────────
+function Telescope({ variant = 0, blob }: { variant?: number; blob: boolean }) {
+  const metal = variant % 2 === 0 ? "#52606a" : "#5d5270";
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.28} />}
+      <mesh position={[0, 0.13, 0]}>
+        <cylinderGeometry args={[0.016, 0.022, 0.26, 8]} />
+        <meshStandardMaterial color={metal} roughness={0.55} metalness={0.25} />
+      </mesh>
+      <mesh position={[0, 0.25, 0.05]} rotation={[1.2, 0, 0]}>
+        <cylinderGeometry args={[0.04, 0.055, 0.28, 12]} />
+        <meshStandardMaterial color="#e8d9b8" roughness={0.55} metalness={0.05} />
+      </mesh>
+      <mesh position={[0, 0.34, 0.16]} rotation={[1.2, 0, 0]}>
+        <cylinderGeometry args={[0.06, 0.06, 0.025, 12]} />
+        <meshStandardMaterial color="#7fbad0" emissive="#7fbad0" emissiveIntensity={0.18} roughness={0.25} />
+      </mesh>
+      <mesh position={[0.07, 0.03, 0.04]} rotation={[0.45, 0, -0.45]}>
+        <cylinderGeometry args={[0.01, 0.012, 0.24, 6]} />
+        <meshStandardMaterial color={metal} roughness={0.7} />
+      </mesh>
+      <mesh position={[-0.07, 0.03, 0.04]} rotation={[0.45, 0, 0.45]}>
+        <cylinderGeometry args={[0.01, 0.012, 0.24, 6]} />
+        <meshStandardMaterial color={metal} roughness={0.7} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 편지함 ─────────────────────────────────────────────────
+function Postbox({ variant = 0, blob }: { variant?: number; blob: boolean }) {
+  const body = variant % 2 === 0 ? "#d46f5d" : "#6aa7b8";
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.22} />}
+      <mesh position={[0, 0.1, 0]}>
+        <cylinderGeometry args={[0.03, 0.04, 0.2, 7]} />
+        <meshStandardMaterial color="#806a54" roughness={0.85} />
+      </mesh>
+      <mesh position={[0, 0.22, 0]}>
+        <boxGeometry args={[0.18, 0.12, 0.14]} />
+        <meshStandardMaterial color={body} roughness={0.65} />
+      </mesh>
+      <mesh position={[0, 0.29, 0]} scale={[1, 0.5, 0.75]}>
+        <sphereGeometry args={[0.09, 12, 8, 0, Math.PI * 2, 0, Math.PI * 0.5]} />
+        <meshStandardMaterial color={body} roughness={0.65} />
+      </mesh>
+      <mesh position={[0, 0.24, 0.071]}>
+        <boxGeometry args={[0.12, 0.025, 0.01]} />
+        <meshStandardMaterial color="#f5e9cf" roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 작은 벤치 ───────────────────────────────────────────────
+function Bench({ variant = 0, blob }: { variant?: number; blob: boolean }) {
+  const wood = variant % 2 === 0 ? "#9b7350" : "#7e6a9b";
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.32} />}
+      <mesh position={[0, 0.13, 0]}>
+        <boxGeometry args={[0.34, 0.045, 0.12]} />
+        <meshStandardMaterial color={wood} roughness={0.82} />
+      </mesh>
+      <mesh position={[0, 0.22, -0.055]} rotation={[0.25, 0, 0]}>
+        <boxGeometry args={[0.34, 0.045, 0.11]} />
+        <meshStandardMaterial color={wood} roughness={0.82} />
+      </mesh>
+      <mesh position={[0.12, 0.06, 0.03]}>
+        <cylinderGeometry args={[0.012, 0.012, 0.12, 6]} />
+        <meshStandardMaterial color="#5b4a3f" roughness={0.8} />
+      </mesh>
+      <mesh position={[-0.12, 0.06, 0.03]}>
+        <cylinderGeometry args={[0.012, 0.012, 0.12, 6]} />
+        <meshStandardMaterial color="#5b4a3f" roughness={0.8} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 바람개비 ───────────────────────────────────────────────
+function Windmill({ variant = 0, phase, blob }: { variant?: number; phase: number; blob: boolean }) {
+  const blades = useRef<Group>(null);
+  const roof = variant % 2 === 0 ? "#cf8a6b" : "#8a84c8";
+  useFrame((_, rawDelta) => {
+    if (reduce()) return;
+    const b = blades.current;
+    if (!b) return;
+    b.rotation.z += Math.min(rawDelta, 0.05) * (2.5 + variant * 0.35);
+  });
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.34} />}
+      <mesh position={[0, 0.19, 0]}>
+        <cylinderGeometry args={[0.08, 0.12, 0.38, 6]} />
+        <meshStandardMaterial color="#e6d8bf" roughness={0.8} flatShading />
+      </mesh>
+      <mesh position={[0, 0.42, 0]}>
+        <coneGeometry args={[0.14, 0.14, 6]} />
+        <meshStandardMaterial color={roof} roughness={0.75} flatShading />
+      </mesh>
+      <group ref={blades} position={[0, 0.28, 0.1]} rotation={[0, 0, phase]}>
+        {[0, Math.PI / 2, Math.PI, (Math.PI * 3) / 2].map((angle) => (
+          <mesh key={angle} position={[Math.cos(angle) * 0.08, Math.sin(angle) * 0.08, 0]} rotation={[0, 0, angle]}>
+            <boxGeometry args={[0.16, 0.025, 0.012]} />
+            <meshStandardMaterial color="#f8f0da" roughness={0.55} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+// ── 선인장 ─────────────────────────────────────────────────
+function Cactus({ variant = 0, phase, blob }: { variant?: number; phase: number; blob: boolean }) {
+  const sway = useRef<Group>(null);
+  useFrame((state) => {
+    if (reduce()) return;
+    const s = sway.current;
+    if (!s) return;
+    s.rotation.z = Math.sin(state.clock.elapsedTime * 0.9 + phase) * 0.035;
+  });
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.24} />}
+      <group ref={sway}>
+        <mesh position={[0, 0.17, 0]}>
+          <cylinderGeometry args={[0.055, 0.06, 0.34, 8]} />
+          <meshStandardMaterial color={variant % 2 === 0 ? "#6fa873" : "#5d9670"} roughness={0.85} flatShading />
+        </mesh>
+        <mesh position={[0.075, 0.21, 0]} rotation={[0, 0, -0.8]}>
+          <cylinderGeometry args={[0.027, 0.03, 0.18, 8]} />
+          <meshStandardMaterial color="#6fa873" roughness={0.85} flatShading />
+        </mesh>
+        <mesh position={[-0.08, 0.13, 0]} rotation={[0, 0, 0.9]}>
+          <cylinderGeometry args={[0.024, 0.027, 0.15, 8]} />
+          <meshStandardMaterial color="#78b47b" roughness={0.85} flatShading />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ── 작은 아치 ───────────────────────────────────────────────
+function Arch({ blob }: { blob: boolean }) {
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.36} />}
+      <mesh position={[0.12, 0.18, 0]}>
+        <cylinderGeometry args={[0.035, 0.045, 0.36, 8]} />
+        <meshStandardMaterial color="#a59688" roughness={0.95} flatShading />
+      </mesh>
+      <mesh position={[-0.12, 0.18, 0]}>
+        <cylinderGeometry args={[0.035, 0.045, 0.36, 8]} />
+        <meshStandardMaterial color="#a59688" roughness={0.95} flatShading />
+      </mesh>
+      <mesh position={[0, 0.36, 0]} rotation={[0, 0, Math.PI / 2]}>
+        <torusGeometry args={[0.12, 0.035, 8, 16, Math.PI]} />
+        <meshStandardMaterial color="#b0a293" roughness={0.95} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 작은 연못 ───────────────────────────────────────────────
+function Pond() {
+  return (
+    <group>
+      <mesh position={[0, 0.018, 0]} rotation={[Math.PI / 2, 0, 0]} scale={[1.35, 0.8, 1]}>
+        <circleGeometry args={[0.22, 24]} />
+        <meshStandardMaterial color="#8dcdd8" emissive="#8dcdd8" emissiveIntensity={0.12} roughness={0.2} />
+      </mesh>
+      <mesh position={[0.14, 0.028, -0.04]} rotation={[0.2, 0.4, 0]}>
+        <dodecahedronGeometry args={[0.04, 0]} />
+        <meshStandardMaterial color="#d4c8ae" roughness={0.9} flatShading />
+      </mesh>
+      <mesh position={[-0.16, 0.025, 0.06]} rotation={[0.4, 0.1, 0.2]}>
+        <dodecahedronGeometry args={[0.035, 0]} />
+        <meshStandardMaterial color="#b7b0a0" roughness={0.9} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 작은 위성 ───────────────────────────────────────────────
+function Satellite({ variant = 0, phase }: { variant?: number; phase: number }) {
+  const group = useRef<Group>(null);
+  useFrame((state, rawDelta) => {
+    if (reduce()) return;
+    const g = group.current;
+    if (!g) return;
+    g.rotation.y += Math.min(rawDelta, 0.05) * 0.65;
+    g.position.y = Math.sin(state.clock.elapsedTime * 1.2 + phase) * 0.035;
+  });
+  return (
+    <group ref={group}>
+      <mesh>
+        <boxGeometry args={[0.16, 0.1, 0.12]} />
+        <meshStandardMaterial color={variant % 2 === 0 ? "#d8d4c8" : "#c7c5e8"} roughness={0.55} metalness={0.25} />
+      </mesh>
+      <mesh position={[0.17, 0, 0]}>
+        <boxGeometry args={[0.16, 0.055, 0.01]} />
+        <meshStandardMaterial color="#6aa7d8" emissive="#6aa7d8" emissiveIntensity={0.18} roughness={0.35} />
+      </mesh>
+      <mesh position={[-0.17, 0, 0]}>
+        <boxGeometry args={[0.16, 0.055, 0.01]} />
+        <meshStandardMaterial color="#6aa7d8" emissive="#6aa7d8" emissiveIntensity={0.18} roughness={0.35} />
+      </mesh>
+      <mesh position={[0, 0.08, 0]} rotation={[0.6, 0, 0]}>
+        <cylinderGeometry args={[0.006, 0.006, 0.12, 6]} />
+        <meshStandardMaterial color="#f0e7cf" roughness={0.45} metalness={0.3} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 조개 ───────────────────────────────────────────────────
+function Shell({ variant = 0, blob }: { variant?: number; blob: boolean }) {
+  const color = variant % 2 === 0 ? "#f2d6c8" : "#e6d2ff";
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.16} />}
+      <mesh position={[0, 0.04, 0]} scale={[1.2, 0.55, 0.85]} rotation={[0.2, 0.4, 0]}>
+        <sphereGeometry args={[0.085, 14, 10]} />
+        <meshStandardMaterial color={color} roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 0.075, 0.025]} rotation={[0.25, 0.4, 0]}>
+        <torusGeometry args={[0.052, 0.006, 6, 16, Math.PI]} />
+        <meshStandardMaterial color="#f8efe0" roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 손등불 ─────────────────────────────────────────────────
+function Lantern({ variant = 0, proxPosition, transform, blob }: InteractiveProps & { variant?: number }) {
+  const mat = useRef<MeshStandardMaterial>(null);
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const p = proximityOf(transform.position.distanceTo(proxPosition));
+    const flicker = reduce() ? 0 : Math.sin(state.clock.elapsedTime * 5.5 + variant) * 0.08;
+    if (mat.current) {
+      mat.current.emissiveIntensity = MathUtils.lerp(mat.current.emissiveIntensity, 0.8 + p * 1.3 + flicker, 1 - Math.exp(-7 * delta));
+    }
+  });
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.18} />}
+      <mesh position={[0, 0.12, 0]}>
+        <cylinderGeometry args={[0.009, 0.012, 0.24, 6]} />
+        <meshStandardMaterial color="#5c5149" roughness={0.75} metalness={0.25} />
+      </mesh>
+      <mesh position={[0, 0.25, 0]}>
+        <sphereGeometry args={[0.055, 12, 10]} />
+        <meshStandardMaterial ref={mat} color="#ffe2a8" emissive="#ffd07a" emissiveIntensity={0.8} roughness={0.2} toneMapped={false} />
+      </mesh>
+      <mesh position={[0, 0.31, 0]}>
+        <torusGeometry args={[0.045, 0.006, 6, 12]} />
+        <meshStandardMaterial color="#5c5149" roughness={0.75} metalness={0.25} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 낮은 구름 ───────────────────────────────────────────────
+function Cloud({ phase }: { phase: number }) {
+  const group = useRef<Group>(null);
+  useFrame((state) => {
+    if (reduce()) return;
+    const g = group.current;
+    if (!g) return;
+    g.position.y = Math.sin(state.clock.elapsedTime * 0.6 + phase) * 0.04;
+    g.rotation.y = Math.sin(state.clock.elapsedTime * 0.4 + phase) * 0.12;
+  });
+  return (
+    <group ref={group}>
+      <mesh position={[-0.08, 0, 0]} scale={[1.1, 0.75, 0.9]}>
+        <sphereGeometry args={[0.09, 12, 10]} />
+        <meshStandardMaterial color="#f4f6f1" roughness={0.85} />
+      </mesh>
+      <mesh position={[0.02, 0.02, 0]} scale={[1.15, 0.8, 0.95]}>
+        <sphereGeometry args={[0.11, 12, 10]} />
+        <meshStandardMaterial color="#fffaf1" roughness={0.85} />
+      </mesh>
+      <mesh position={[0.12, -0.005, 0]} scale={[1.0, 0.7, 0.85]}>
+        <sphereGeometry args={[0.08, 12, 10]} />
+        <meshStandardMaterial color="#eef2f4" roughness={0.85} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 종이배 ─────────────────────────────────────────────────
+function PaperBoat({ variant = 0, phase }: { variant?: number; phase: number }) {
+  const boat = useRef<Group>(null);
+  useFrame((state) => {
+    if (reduce()) return;
+    const b = boat.current;
+    if (!b) return;
+    b.rotation.z = Math.sin(state.clock.elapsedTime * 1.2 + phase) * 0.08;
+    b.rotation.x = Math.cos(state.clock.elapsedTime * 0.8 + phase) * 0.04;
+  });
+  return (
+    <group ref={boat}>
+      <mesh position={[-0.045, 0.055, 0]} rotation={[0, 0, -0.35]}>
+        <boxGeometry args={[0.12, 0.018, 0.08]} />
+        <meshStandardMaterial color={variant % 2 === 0 ? "#f8f0da" : "#e6d2ff"} roughness={0.55} />
+      </mesh>
+      <mesh position={[0.045, 0.055, 0]} rotation={[0, 0, 0.35]}>
+        <boxGeometry args={[0.12, 0.018, 0.08]} />
+        <meshStandardMaterial color="#fff7e4" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 0.105, 0]} rotation={[0, 0, Math.PI / 4]}>
+        <coneGeometry args={[0.055, 0.11, 3]} />
+        <meshStandardMaterial color="#f5c879" roughness={0.5} />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 돌고리 ─────────────────────────────────────────────────
+function RingStone({ variant = 0, blob }: { variant?: number; blob: boolean }) {
+  const stone = variant % 2 === 0 ? "#a8a5b2" : "#b7a58e";
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.3} />}
+      <mesh position={[0, 0.13, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <torusGeometry args={[0.13, 0.028, 8, 18]} />
+        <meshStandardMaterial color={stone} roughness={0.95} flatShading />
+      </mesh>
+      <mesh position={[0.15, 0.045, 0.04]} rotation={[0.4, 0.2, 0]}>
+        <dodecahedronGeometry args={[0.055, 0]} />
+        <meshStandardMaterial color={stone} roughness={0.95} flatShading />
+      </mesh>
+      <mesh position={[-0.13, 0.04, -0.05]} rotation={[0.1, 0.5, 0.2]}>
+        <dodecahedronGeometry args={[0.045, 0]} />
+        <meshStandardMaterial color="#928f9b" roughness={0.95} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
+// ── 작은 깃발 ───────────────────────────────────────────────
+function TinyFlag({ variant = 0, phase, blob }: { variant?: number; phase: number; blob: boolean }) {
+  const flag = useRef<Group>(null);
+  const color = variant % 2 === 0 ? "#f5b66c" : "#9fd7e5";
+  useFrame((state) => {
+    if (reduce()) return;
+    const f = flag.current;
+    if (!f) return;
+    f.rotation.y = Math.sin(state.clock.elapsedTime * 2.2 + phase) * 0.18;
+  });
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.16} />}
+      <mesh position={[0, 0.14, 0]}>
+        <cylinderGeometry args={[0.008, 0.01, 0.28, 6]} />
+        <meshStandardMaterial color="#6d5c4f" roughness={0.75} />
+      </mesh>
+      <group ref={flag} position={[0.055, 0.24, 0]}>
+        <mesh>
+          <boxGeometry args={[0.11, 0.065, 0.012]} />
+          <meshStandardMaterial color={color} roughness={0.55} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ── 혜성 조각 ───────────────────────────────────────────────
+function Comet({ variant = 0, phase }: { variant?: number; phase: number }) {
+  const group = useRef<Group>(null);
+  const color = variant % 2 === 0 ? "#fff0bd" : "#c8ecff";
+  useFrame((state, rawDelta) => {
+    if (reduce()) return;
+    const g = group.current;
+    if (!g) return;
+    g.rotation.y += Math.min(rawDelta, 0.05) * 0.8;
+    g.position.y = Math.sin(state.clock.elapsedTime * 1.1 + phase) * 0.035;
+  });
+  return (
+    <group ref={group}>
+      <mesh>
+        <icosahedronGeometry args={[0.075, 0]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={1.05} roughness={0.25} toneMapped={false} flatShading />
+      </mesh>
+      <mesh position={[0, 0, -0.14]} rotation={[Math.PI / 2, 0, 0]}>
+        <coneGeometry args={[0.045, 0.28, 10]} />
+        <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.45} transparent opacity={0.55} toneMapped={false} />
+      </mesh>
+    </group>
+  );
+}
+
 function renderKind(
   decoration: Decoration,
   index: number,
@@ -502,6 +932,38 @@ function renderKind(
       return <Star proxPosition={proxPosition} transform={transform} variant={decoration.variant} />;
     case "fox":
       return <FoxCompanion proxPosition={proxPosition} transform={transform} blob={blob} />;
+    case "crystal":
+      return <Crystal variant={decoration.variant} phase={phase} blob={blob} />;
+    case "telescope":
+      return <Telescope variant={decoration.variant} blob={blob} />;
+    case "postbox":
+      return <Postbox variant={decoration.variant} blob={blob} />;
+    case "bench":
+      return <Bench variant={decoration.variant} blob={blob} />;
+    case "windmill":
+      return <Windmill variant={decoration.variant} phase={phase} blob={blob} />;
+    case "cactus":
+      return <Cactus variant={decoration.variant} phase={phase} blob={blob} />;
+    case "arch":
+      return <Arch blob={blob} />;
+    case "pond":
+      return <Pond />;
+    case "satellite":
+      return <Satellite variant={decoration.variant} phase={phase} />;
+    case "shell":
+      return <Shell variant={decoration.variant} blob={blob} />;
+    case "lantern":
+      return <Lantern proxPosition={proxPosition} transform={transform} blob={blob} variant={decoration.variant} />;
+    case "cloud":
+      return <Cloud phase={phase} />;
+    case "paperBoat":
+      return <PaperBoat variant={decoration.variant} phase={phase} />;
+    case "ringStone":
+      return <RingStone variant={decoration.variant} blob={blob} />;
+    case "tinyFlag":
+      return <TinyFlag variant={decoration.variant} phase={phase} blob={blob} />;
+    case "comet":
+      return <Comet variant={decoration.variant} phase={phase} />;
   }
 }
 
@@ -540,11 +1002,17 @@ function DecorationItem({
  */
 export default function Decorations({ transform }: { transform: PlayerTransform }) {
   const isTouch = useSettingsStore((s) => s.isTouch);
+  const activePlanetId = useGameStore((s) => s.activePlanetId);
+  const visibleDecorations = useMemo(
+    () => decorations.filter((decoration) => (decoration.planetId ?? HOME_PLANET_ID) === activePlanetId),
+    [activePlanetId],
+  );
+
   return (
     <>
-      {decorations.map((decoration, i) => (
+      {visibleDecorations.map((decoration, i) => (
         <DecorationItem
-          key={`${decoration.kind}-${i}`}
+          key={`${activePlanetId}-${decoration.kind}-${i}`}
           decoration={decoration}
           index={i}
           blob={isTouch}

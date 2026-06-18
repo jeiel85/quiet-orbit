@@ -1,9 +1,13 @@
+import type { PlanetId } from "@/types/world";
+
 /** 메시지의 정서적 톤 — Orb 색상 등 시각 표현에 사용. */
 export type MessageTone = "warm" | "quiet" | "hope" | "memory";
 
 /** 행성 위에 놓이는 빛나는 메시지 하나. 위치는 구면 좌표(theta/phi)로 관리한다. */
 export interface Message {
   id: string;
+  /** 생략하면 시작 행성(home)에 배치된다. */
+  planetId?: PlanetId;
   title: string;
   body: string;
   position: {

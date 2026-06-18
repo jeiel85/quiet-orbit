@@ -41,7 +41,7 @@ export default function Player({ transform }: PlayerProps) {
     elapsed.current += delta;
 
     const game = useGameStore.getState();
-    const locked = !game.started || game.openedMessageId !== null;
+    const locked = !game.started || game.openedMessageId !== null || game.travel !== null;
     const { forward: rawForward, turn: rawTurn } = resolveMovement();
     const moveDir = locked ? 0 : rawForward;
     const turnDir = locked ? 0 : rawTurn;

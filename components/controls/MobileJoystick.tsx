@@ -15,6 +15,7 @@ const MAX_RADIUS = 44;
 export default function MobileJoystick() {
   const isTouch = useSettingsStore((s) => s.isTouch);
   const started = useGameStore((s) => s.started);
+  const travel = useGameStore((s) => s.travel);
 
   const baseRef = useRef<HTMLDivElement>(null);
   const knobRef = useRef<HTMLDivElement>(null);
@@ -22,7 +23,7 @@ export default function MobileJoystick() {
   const center = useRef({ x: 0, y: 0 });
   const [active, setActive] = useState(false);
 
-  if (!isTouch || !started) return null;
+  if (!isTouch || !started || travel) return null;
 
   const updateFrom = (clientX: number, clientY: number) => {
     let dx = clientX - center.current.x;

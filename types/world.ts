@@ -1,5 +1,47 @@
 import type { Vector3 } from "three";
 
+export type PlanetId = "home" | "dawn" | "ember" | "violet";
+
+export interface SurfacePoint {
+  theta: number;
+  phi: number;
+  /** 진행 방향 회전값(rad). 0이면 남쪽(phi 증가 방향), +이면 동쪽 방향으로 돈다. */
+  heading?: number;
+  /** 표면 기준 추가 높이. */
+  radiusOffset?: number;
+}
+
+export interface PlanetDefinition {
+  id: PlanetId;
+  name: string;
+  subtitle: string;
+  groundColor: string;
+  accentColor: string;
+  fogColor: string;
+  startPoint: SurfacePoint;
+}
+
+export interface TravelSpot extends SurfacePoint {
+  id: string;
+  planetId: PlanetId;
+  targetPlanetId: PlanetId;
+  targetPoint: SurfacePoint;
+  label: string;
+  description: string;
+  color: string;
+  variant?: number;
+}
+
+export interface TravelState {
+  spotId: string;
+  fromPlanetId: PlanetId;
+  toPlanetId: PlanetId;
+  targetPoint: SurfacePoint;
+  label: string;
+  startedAt: number;
+  durationMs: number;
+}
+
 /**
  * Player 가 매 프레임 갱신하고 CameraRig 가 읽는 공유 트랜스폼.
  * React state 를 거치지 않고 ref 처럼 직접 변경한다 (프레임마다 re-render 금지).

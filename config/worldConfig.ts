@@ -19,6 +19,17 @@ export const worldConfig = {
   // 상호작용 (Goal 3)
   interactionRadius: 0.55,
 
+  // 행성 간 이동 스팟
+  travelSpot: {
+    interactionRadius: 0.78,
+    heightOffset: 0.16,
+    markerRadius: 0.18,
+  },
+
+  travel: {
+    durationMs: 2600,
+  },
+
   // 메시지 Orb
   orb: {
     heightOffset: 0.42, // 행성 표면 위로 띄우는 기본 높이

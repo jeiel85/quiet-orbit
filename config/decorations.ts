@@ -1,3 +1,5 @@
+import type { PlanetId } from "@/types/world";
+
 export type DecorationKind =
   | "tree"
   | "rock"
@@ -9,10 +11,28 @@ export type DecorationKind =
   | "lamp" // 가로등 (인터랙티브)
   | "star" // 표면 위 떠 있는 별 (인터랙티브)
   | "mushroom"
-  | "fox"; // 어린왕자의 컴패니언 (인터랙티브)
+  | "fox" // 어린왕자의 컴패니언 (인터랙티브)
+  | "crystal"
+  | "telescope"
+  | "postbox"
+  | "bench"
+  | "windmill"
+  | "cactus"
+  | "arch"
+  | "pond"
+  | "satellite"
+  | "shell"
+  | "lantern"
+  | "cloud"
+  | "paperBoat"
+  | "ringStone"
+  | "tinyFlag"
+  | "comet";
 
 export interface Decoration {
   kind: DecorationKind;
+  /** 생략하면 시작 행성(home)에 배치된다. */
+  planetId?: PlanetId;
   /** 표면 위치 — 구면 좌표(경도/위도). */
   theta: number;
   phi: number;
@@ -104,4 +124,74 @@ export const decorations: Decoration[] = [
   { kind: "flower", theta: 5.05, phi: 1.3, scale: 0.9, variant: 1 },
   { kind: "flower", theta: 6.05, phi: 1.35, scale: 1.0, variant: 2 },
   { kind: "flower", theta: 3.55, phi: 2.15, scale: 0.85, variant: 1 },
+
+  // ── 새벽 편지별: 종이배·연못·바람개비·편지함 ─────────────
+  { planetId: "dawn", kind: "pond", theta: 0.55, phi: 1.92, scale: 1.25 },
+  { planetId: "dawn", kind: "paperBoat", theta: 0.72, phi: 1.82, scale: 1.0, variant: 0 },
+  { planetId: "dawn", kind: "paperBoat", theta: 0.38, phi: 2.05, scale: 0.85, variant: 1 },
+  { planetId: "dawn", kind: "windmill", theta: 2.95, phi: 1.25, scale: 1.05 },
+  { planetId: "dawn", kind: "windmill", theta: 3.35, phi: 1.45, scale: 0.78, variant: 1 },
+  { planetId: "dawn", kind: "postbox", theta: 1.1, phi: 1.1, scale: 1.0 },
+  { planetId: "dawn", kind: "postbox", theta: 4.65, phi: 1.75, scale: 0.9, variant: 1 },
+  { planetId: "dawn", kind: "bench", theta: 1.8, phi: 1.75, scale: 0.95 },
+  { planetId: "dawn", kind: "lantern", theta: 4.05, phi: 1.28, scale: 1.0, variant: 0 },
+  { planetId: "dawn", kind: "lantern", theta: 5.4, phi: 2.1, scale: 0.85, variant: 1 },
+  { planetId: "dawn", kind: "shell", theta: 5.05, phi: 1.55, scale: 0.8, variant: 0 },
+  { planetId: "dawn", kind: "shell", theta: 5.65, phi: 1.85, scale: 0.7, variant: 1 },
+  { planetId: "dawn", kind: "cloud", theta: 2.15, phi: 0.85, scale: 1.0, radiusOffset: 0.85 },
+  { planetId: "dawn", kind: "cloud", theta: 4.95, phi: 1.0, scale: 0.8, radiusOffset: 0.75 },
+  { planetId: "dawn", kind: "tree", theta: 0.95, phi: 1.55, scale: 0.8 },
+  { planetId: "dawn", kind: "tree", theta: 2.25, phi: 2.05, scale: 0.9 },
+  { planetId: "dawn", kind: "mushroom", theta: 3.7, phi: 1.85, scale: 0.9, variant: 1 },
+  { planetId: "dawn", kind: "flower", theta: 0.95, phi: 1.25, scale: 0.9, variant: 1 },
+  { planetId: "dawn", kind: "flower", theta: 1.45, phi: 1.55, scale: 0.85, variant: 2 },
+  { planetId: "dawn", kind: "flower", theta: 2.7, phi: 1.72, scale: 1.0, variant: 0 },
+  { planetId: "dawn", kind: "flower", theta: 3.95, phi: 2.2, scale: 0.85, variant: 1 },
+  { planetId: "dawn", kind: "rock", theta: 5.95, phi: 1.28, scale: 0.8 },
+
+  // ── 붉은 먼지별: 수정·선인장·아치·혜성 조각 ───────────────
+  { planetId: "ember", kind: "crystal", theta: 2.35, phi: 1.1, scale: 1.1, variant: 0 },
+  { planetId: "ember", kind: "crystal", theta: 2.7, phi: 1.35, scale: 0.85, variant: 1 },
+  { planetId: "ember", kind: "crystal", theta: 1.45, phi: 1.8, scale: 0.95, variant: 2 },
+  { planetId: "ember", kind: "cactus", theta: 0.9, phi: 1.45, scale: 0.95 },
+  { planetId: "ember", kind: "cactus", theta: 4.55, phi: 1.25, scale: 0.85, variant: 1 },
+  { planetId: "ember", kind: "arch", theta: 3.92, phi: 2.02, scale: 1.1 },
+  { planetId: "ember", kind: "ringStone", theta: 5.15, phi: 1.8, scale: 1.0 },
+  { planetId: "ember", kind: "ringStone", theta: 0.35, phi: 2.1, scale: 0.8, variant: 1 },
+  { planetId: "ember", kind: "comet", theta: 1.9, phi: 0.82, scale: 0.9, radiusOffset: 0.95 },
+  { planetId: "ember", kind: "comet", theta: 5.7, phi: 1.05, scale: 0.75, radiusOffset: 0.8, variant: 1 },
+  { planetId: "ember", kind: "tinyFlag", theta: 1.58, phi: 1.38, scale: 1.0, variant: 0 },
+  { planetId: "ember", kind: "lantern", theta: 0.6, phi: 1.95, scale: 0.9, variant: 1 },
+  { planetId: "ember", kind: "volcano", theta: 5.3, phi: 1.55, scale: 1.0, variant: 1 },
+  { planetId: "ember", kind: "volcano", theta: 3.35, phi: 1.45, scale: 0.85, variant: 0 },
+  { planetId: "ember", kind: "rock", theta: 0.95, phi: 1.7, scale: 1.0 },
+  { planetId: "ember", kind: "rock", theta: 4.8, phi: 2.12, scale: 0.85 },
+  { planetId: "ember", kind: "mushroom", theta: 2.9, phi: 2.0, scale: 0.85, variant: 0 },
+  { planetId: "ember", kind: "flower", theta: 1.1, phi: 2.25, scale: 0.8, variant: 0 },
+  { planetId: "ember", kind: "flower", theta: 3.75, phi: 1.2, scale: 0.9, variant: 1 },
+  { planetId: "ember", kind: "flower", theta: 5.9, phi: 1.62, scale: 0.85, variant: 2 },
+  { planetId: "ember", kind: "tree", theta: 4.1, phi: 1.85, scale: 0.75 },
+  { planetId: "ember", kind: "house", theta: 2.05, phi: 2.12, scale: 0.82 },
+
+  // ── 보랏빛 궤도별: 망원경·위성·돌고리·떠 있는 구름 ───────
+  { planetId: "violet", kind: "satellite", theta: 4.6, phi: 1.2, scale: 1.0, radiusOffset: 0.95 },
+  { planetId: "violet", kind: "satellite", theta: 0.3, phi: 1.95, scale: 0.7, radiusOffset: 0.85, variant: 1 },
+  { planetId: "violet", kind: "telescope", theta: 2.65, phi: 1.85, scale: 1.05 },
+  { planetId: "violet", kind: "telescope", theta: 5.05, phi: 1.22, scale: 0.9, variant: 1 },
+  { planetId: "violet", kind: "ringStone", theta: 5.45, phi: 1.65, scale: 1.1 },
+  { planetId: "violet", kind: "ringStone", theta: 1.1, phi: 2.1, scale: 0.85, variant: 1 },
+  { planetId: "violet", kind: "cloud", theta: 1.85, phi: 0.88, scale: 1.1, radiusOffset: 0.9 },
+  { planetId: "violet", kind: "cloud", theta: 3.85, phi: 1.95, scale: 0.85, radiusOffset: 0.78 },
+  { planetId: "violet", kind: "comet", theta: 0.65, phi: 1.3, scale: 0.85, radiusOffset: 0.8 },
+  { planetId: "violet", kind: "crystal", theta: 1.85, phi: 2.02, scale: 0.85, variant: 2 },
+  { planetId: "violet", kind: "bench", theta: 3.45, phi: 1.25, scale: 0.95, variant: 1 },
+  { planetId: "violet", kind: "tinyFlag", theta: 2.2, phi: 1.4, scale: 0.9, variant: 1 },
+  { planetId: "violet", kind: "star", theta: 4.15, phi: 1.7, scale: 0.9, radiusOffset: 0.85, variant: 2 },
+  { planetId: "violet", kind: "star", theta: 5.8, phi: 2.0, scale: 0.8, radiusOffset: 0.75, variant: 1 },
+  { planetId: "violet", kind: "lantern", theta: 0.95, phi: 1.75, scale: 0.85, variant: 1 },
+  { planetId: "violet", kind: "flower", theta: 1.35, phi: 1.25, scale: 0.9, variant: 2 },
+  { planetId: "violet", kind: "flower", theta: 2.9, phi: 2.18, scale: 0.8, variant: 1 },
+  { planetId: "violet", kind: "mushroom", theta: 4.85, phi: 1.9, scale: 0.8, variant: 1 },
+  { planetId: "violet", kind: "rock", theta: 3.0, phi: 1.08, scale: 0.95 },
+  { planetId: "violet", kind: "tree", theta: 5.95, phi: 1.45, scale: 0.82 },
 ];
