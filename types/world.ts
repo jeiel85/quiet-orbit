@@ -1,6 +1,6 @@
 import type { Vector3 } from "three";
 
-export type PlanetId = "home" | "dawn" | "ember" | "violet";
+export type PlanetId = "home" | "dawn" | "ember" | "violet" | "summit" | "tide" | "brook";
 
 export interface SurfacePoint {
   theta: number;

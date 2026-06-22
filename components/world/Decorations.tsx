@@ -1,6 +1,20 @@
-import { useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { useFrame, type ThreeEvent } from "@react-three/fiber";
-import { type Group, MathUtils, type MeshStandardMaterial, Quaternion, Vector3 } from "three";
+import {
+  BufferGeometry,
+  CatmullRomCurve3,
+  Color,
+  DoubleSide,
+  Float32BufferAttribute,
+  type Group,
+  type InstancedMesh,
+  MathUtils,
+  type MeshStandardMaterial,
+  Object3D,
+  Quaternion,
+  TubeGeometry,
+  Vector3,
+} from "three";
 import { decorations, type Decoration } from "@/config/decorations";
 import { HOME_PLANET_ID } from "@/config/planets";
 import { worldConfig } from "@/config/worldConfig";
@@ -17,6 +31,19 @@ const LOCAL_UP = new Vector3(0, 1, 0);
 const FLOWER_PETAL = ["#f4a6c0", "#fdfbf6", "#c9b8ee"]; // variant 별 꽃잎 색
 const MUSHROOM_CAP = ["#d96b5c", "#e7b24a"]; // variant 별 버섯 갓 색
 const STAR_COLOR = ["#fff0c2", "#bfe6f5", "#e6d2ff"]; // variant 별 별 색
+const GRASS_COLOR = ["#7fb86a", "#9ccb6f", "#cdb56a"]; // variant 별 들풀 색(초록·연두·마른풀)
+const REED_STEM = ["#86a86a", "#b7a85f"]; // variant 별 갈대 줄기
+
+// 결정적 의사난수(들풀 흩뿌리기용) — 같은 seed 면 항상 같은 배치(렌더 안정).
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
 
 // 근접도 0..1 — 플레이어가 NEAR 안이면 1, FAR 밖이면 0.
 const NEAR = 0.55;
@@ -1143,6 +1170,214 @@ function MoonGate({
   );
 }
 
+// ── 산 (낮은 봉우리, variant 1 = 설산) ───────────────────────
+function Mountain({ variant = 0, blob }: { variant?: number; blob: boolean }) {
+  const snow = variant === 1;
+  return (
+    <group>
+      {blob && <ShadowBlob radius={0.6} />}
+      <mesh position={[0, 0.32, 0]}>
+        <coneGeometry args={[0.52, 0.66, 7]} />
+        <meshStandardMaterial color="#8d9a8e" flatShading roughness={0.96} />
+      </mesh>
+      <mesh position={[0.28, 0.18, -0.1]} rotation={[0, 0.6, 0.06]}>
+        <coneGeometry args={[0.3, 0.44, 6]} />
+        <meshStandardMaterial color="#7e8b82" flatShading roughness={0.96} />
+      </mesh>
+      <mesh position={[-0.24, 0.14, 0.09]} rotation={[0, 0.3, -0.05]}>
+        <coneGeometry args={[0.24, 0.36, 6]} />
+        <meshStandardMaterial color="#97a39a" flatShading roughness={0.96} />
+      </mesh>
+      {snow && (
+        <mesh position={[0, 0.52, 0]}>
+          <coneGeometry args={[0.21, 0.24, 7]} />
+          <meshStandardMaterial color="#eef4f6" flatShading roughness={0.7} />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+// ── 바다/호수 (표면 곡률을 따라가는 구면 캡 + 은은한 반짝임) ──
+// 평면 디스크는 큰 바다에서 가장자리가 행성 표면 위로 떠 보인다 →
+// 행성과 같은 중심의 구면 캡으로 만들어 어느 크기든 표면을 감싸게 한다.
+function makeWaterCap(arc: number, rings = 8, segments = 40): BufferGeometry {
+  const R = worldConfig.planetRadius + 0.02; // 표면 살짝 위
+  const base = worldConfig.planetRadius;
+  const positions: number[] = [];
+  const indices: number[] = [];
+  for (let r = 0; r <= rings; r++) {
+    const a = (r / rings) * arc;
+    const y = R * Math.cos(a) - base; // 로컬 +Y = 법선, 정점은 표면을 따라 내려간다
+    const ringR = R * Math.sin(a);
+    for (let s = 0; s <= segments; s++) {
+      const b = (s / segments) * Math.PI * 2;
+      positions.push(ringR * Math.cos(b), y, ringR * Math.sin(b));
+    }
+  }
+  const row = segments + 1;
+  for (let r = 0; r < rings; r++) {
+    for (let s = 0; s < segments; s++) {
+      const a0 = r * row + s;
+      const b0 = (r + 1) * row + s;
+      indices.push(a0, b0, a0 + 1, a0 + 1, b0, b0 + 1);
+    }
+  }
+  const geo = new BufferGeometry();
+  geo.setAttribute("position", new Float32BufferAttribute(positions, 3));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function Water({ phase, size = 1 }: { phase: number; size?: number }) {
+  const mat = useRef<MeshStandardMaterial>(null);
+  // size(=decoration.scale)로 바다의 호(arc) 반경을 키운다. 그룹 scale 은 water 에서 1 로 고정(캡 왜곡 방지).
+  const geo = useMemo(() => makeWaterCap(MathUtils.clamp(0.4 * size, 0.18, 1.0)), [size]);
+  useEffect(() => () => geo.dispose(), [geo]);
+  useFrame((state) => {
+    if (reduce()) return;
+    const m = mat.current;
+    if (!m) return;
+    m.emissiveIntensity = 0.12 + Math.sin(state.clock.elapsedTime * 0.8 + phase) * 0.05;
+  });
+  return (
+    <mesh geometry={geo}>
+      <meshStandardMaterial
+        ref={mat}
+        color="#86cdd8"
+        emissive="#86cdd8"
+        emissiveIntensity={0.12}
+        roughness={0.2}
+        transparent
+        opacity={0.88}
+        depthWrite={false}
+        side={DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+// ── 강/시내 (표면에 드레이프된 굽이치는 반투명 리본) ─────────
+function River({ phase }: { phase: number }) {
+  const mat = useRef<MeshStandardMaterial>(null);
+  const geo = useMemo(() => {
+    const R = worldConfig.planetRadius + 0.015;
+    const base = worldConfig.planetRadius;
+    // 로컬 평면의 (x,z) 제어점을 행성 구면에 얹어(y 계산) 강이 표면을 따라 흐르게 한다.
+    const drape = (x: number, z: number) => {
+      const rho = Math.hypot(x, z);
+      const y = Math.sqrt(Math.max(0, R * R - rho * rho)) - base;
+      return new Vector3(x, y, z);
+    };
+    const curve = new CatmullRomCurve3([
+      drape(-0.95, -0.45),
+      drape(-0.4, -0.12),
+      drape(0.05, 0.2),
+      drape(0.5, -0.06),
+      drape(0.98, 0.42),
+    ]);
+    return new TubeGeometry(curve, 60, 0.07, 8, false);
+  }, []);
+  useEffect(() => () => geo.dispose(), [geo]);
+  useFrame((state) => {
+    if (reduce()) return;
+    const m = mat.current;
+    if (!m) return;
+    m.emissiveIntensity = 0.1 + Math.sin(state.clock.elapsedTime * 1.1 + phase) * 0.05;
+  });
+  return (
+    <mesh geometry={geo}>
+      <meshStandardMaterial
+        ref={mat}
+        color="#86cdd8"
+        emissive="#86cdd8"
+        emissiveIntensity={0.12}
+        roughness={0.2}
+        transparent
+        opacity={0.9}
+        depthWrite={false}
+        side={DoubleSide}
+      />
+    </mesh>
+  );
+}
+
+// ── 들풀 무더기 (InstancedMesh — 한 항목이 여러 포기, 정적이라 reduce-motion 안전) ──
+function GrassPatch({ variant = 0, blob, seed }: { variant?: number; blob: boolean; seed: number }) {
+  const ref = useRef<InstancedMesh>(null);
+  const count = blob ? 16 : 28;
+  const base = GRASS_COLOR[variant % GRASS_COLOR.length];
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const rand = mulberry32(seed + 1);
+    const dummy = new Object3D();
+    const col = new Color();
+    for (let i = 0; i < count; i++) {
+      const ang = rand() * Math.PI * 2;
+      const rad = Math.sqrt(rand()) * (0.42 + variant * 0.02);
+      const h = 0.07 + rand() * 0.1;
+      dummy.position.set(Math.cos(ang) * rad, h / 2, Math.sin(ang) * rad);
+      dummy.rotation.set((rand() - 0.5) * 0.2, rand() * Math.PI, (rand() - 0.5) * 0.35);
+      dummy.scale.set(0.7 + rand() * 0.6, h / 0.12, 0.7 + rand() * 0.6);
+      dummy.updateMatrix();
+      mesh.setMatrixAt(i, dummy.matrix);
+      col.set(base).offsetHSL(0, 0, (rand() - 0.5) * 0.12);
+      mesh.setColorAt(i, col);
+    }
+    mesh.instanceMatrix.needsUpdate = true;
+    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    // 인스턴스 행렬을 반영한 경계구 재계산 — 기본 컬링은 인스턴스를 고려하지 않아
+    // 패치 중심이 화면 밖이면 보이는 풀까지 잘못 컬링된다.
+    mesh.computeBoundingSphere();
+  }, [count, seed, base, variant]);
+  return (
+    <instancedMesh ref={ref} args={[undefined, undefined, count]}>
+      <coneGeometry args={[0.02, 0.12, 4]} />
+      <meshStandardMaterial flatShading roughness={0.9} />
+    </instancedMesh>
+  );
+}
+
+// ── 갈대 (물가의 가는 줄기, 바람에 흔들림) ───────────────────
+function Reed({ phase, variant = 0 }: { phase: number; variant?: number }) {
+  const group = useRef<Group>(null);
+  useFrame((state) => {
+    if (reduce()) return;
+    const g = group.current;
+    if (!g) return;
+    g.rotation.z = Math.sin(state.clock.elapsedTime * 1.4 + phase) * 0.12;
+  });
+  const stem = REED_STEM[variant % REED_STEM.length];
+  const tuft = variant % 2 === 0 ? "#7d9a5f" : "#b8a85c";
+  const blades = useMemo(
+    () => [
+      { x: 0, z: 0, h: 0.34, t: 0 },
+      { x: 0.05, z: 0.04, h: 0.27, t: 0.5 },
+      { x: -0.05, z: 0.03, h: 0.3, t: 1.0 },
+      { x: 0.02, z: -0.05, h: 0.24, t: 1.6 },
+    ],
+    [],
+  );
+  return (
+    <group ref={group}>
+      {blades.map((b, i) => (
+        <group key={i} position={[b.x, 0, b.z]} rotation={[0, 0, Math.sin(b.t) * 0.12]}>
+          <mesh position={[0, b.h / 2, 0]}>
+            <cylinderGeometry args={[0.006, 0.012, b.h, 5]} />
+            <meshStandardMaterial color={stem} roughness={0.85} flatShading />
+          </mesh>
+          <mesh position={[0, b.h, 0]}>
+            <coneGeometry args={[0.022, 0.07, 6]} />
+            <meshStandardMaterial color={tuft} roughness={0.8} />
+          </mesh>
+        </group>
+      ))}
+    </group>
+  );
+}
+
 function renderKind(
   decoration: Decoration,
   index: number,
@@ -1214,6 +1449,22 @@ function renderKind(
       return <BubbleSpring variant={decoration.variant} phase={phase} proxPosition={proxPosition} transform={transform} blob={blob} />;
     case "moonGate":
       return <MoonGate variant={decoration.variant} phase={phase} proxPosition={proxPosition} transform={transform} blob={blob} />;
+    case "mountain":
+      return <Mountain variant={decoration.variant} blob={blob} />;
+    case "water":
+      return <Water phase={phase} size={decoration.scale ?? 1} />;
+    case "river":
+      return <River phase={phase} />;
+    case "grass":
+      return (
+        <GrassPatch
+          variant={decoration.variant}
+          blob={blob}
+          seed={Math.round((decoration.theta * 131 + decoration.phi * 197) * 1000) + index}
+        />
+      );
+    case "reed":
+      return <Reed phase={phase} variant={decoration.variant} />;
   }
 }
 
@@ -1238,8 +1489,12 @@ function DecorationItem({
     return { position: pos, quaternion: quat, proxPosition: surface };
   }, [decoration]);
 
+  // water 는 자체적으로 행성 곡률을 따르는 캡 지오메트리를 만들므로 그룹 scale 로 키우면
+  // 캡이 구에서 떨어진다 → water 만 scale 1 고정(크기는 Water 의 size prop 으로 처리).
+  const groupScale = decoration.kind === "water" ? 1 : decoration.scale ?? 1;
+
   return (
-    <group position={position} quaternion={quaternion} scale={decoration.scale ?? 1}>
+    <group position={position} quaternion={quaternion} scale={groupScale}>
       {renderKind(decoration, index, blob, proxPosition, transform)}
     </group>
   );
@@ -1254,8 +1509,13 @@ export default function Decorations({ transform }: { transform: PlayerTransform 
   const isTouch = useSettingsStore((s) => s.isTouch);
   const activePlanetId = useGameStore((s) => s.activePlanetId);
   const visibleDecorations = useMemo(
-    () => decorations.filter((decoration) => (decoration.planetId ?? HOME_PLANET_ID) === activePlanetId),
-    [activePlanetId],
+    () =>
+      decorations.filter(
+        (decoration) =>
+          (decoration.planetId ?? HOME_PLANET_ID) === activePlanetId &&
+          !(isTouch && decoration.mobileHidden),
+      ),
+    [activePlanetId, isTouch],
   );
 
   return (

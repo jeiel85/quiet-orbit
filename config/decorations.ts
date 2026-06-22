@@ -31,7 +31,12 @@ export type DecorationKind =
   | "musicBox"
   | "letterSpiral"
   | "bubbleSpring"
-  | "moonGate";
+  | "moonGate"
+  | "mountain" // 낮은 봉우리 (variant 1 = 눈 덮인 설산)
+  | "water" // 잔잔한 바다/호수 (납작 반투명 면)
+  | "river" // 굽이치는 시내 (반투명 리본)
+  | "grass" // 들풀 무더기 (인스턴스드 — 한 항목이 여러 포기)
+  | "reed"; // 물가 갈대
 
 export interface Decoration {
   kind: DecorationKind;
@@ -46,6 +51,8 @@ export interface Decoration {
   variant?: number;
   /** 표면 위로 띄우는 추가 높이 — 떠 있는 별 등. */
   radiusOffset?: number;
+  /** 모바일(터치)에서는 렌더 생략 — 비필수 장식으로 드로우콜을 줄인다(데스크톱은 그대로 풍성). */
+  mobileHidden?: boolean;
 }
 
 /**
@@ -222,4 +229,103 @@ export const decorations: Decoration[] = [
   { planetId: "violet", kind: "mushroom", theta: 4.85, phi: 1.9, scale: 0.8, variant: 1 },
   { planetId: "violet", kind: "rock", theta: 3.0, phi: 1.08, scale: 0.95 },
   { planetId: "violet", kind: "tree", theta: 5.95, phi: 1.45, scale: 0.82 },
+
+  // ── 작은 초록별 보강: 들풀·시내·낮은 산 ──────────────────────
+  // 데스크톱은 전부 렌더, 모바일(mobileHidden)은 비필수 장식을 생략해 드로우콜을 줄인다.
+  { kind: "grass", theta: 0.85, phi: 1.45, scale: 1.0, variant: 0 },
+  { kind: "grass", theta: 1.7, phi: 1.25, scale: 1.0, variant: 1 },
+  { kind: "grass", theta: 2.6, phi: 1.7, scale: 1.1, variant: 0, mobileHidden: true },
+  { kind: "grass", theta: 3.5, phi: 1.25, scale: 1.0, variant: 1, mobileHidden: true },
+  { kind: "grass", theta: 4.6, phi: 1.6, scale: 1.0, variant: 0, mobileHidden: true },
+  { kind: "grass", theta: 5.4, phi: 1.35, scale: 1.1, variant: 1, mobileHidden: true },
+  { kind: "river", theta: 2.0, phi: 1.78, scale: 1.0 },
+  { kind: "mountain", theta: 5.5, phi: 1.02, scale: 1.5, variant: 0 }, // 빈 능선으로 이동(꽃·소품과 안 겹치게)
+  { kind: "mountain", theta: 0.35, phi: 2.05, scale: 1.4, variant: 1, mobileHidden: true },
+  { kind: "reed", theta: 2.25, phi: 1.7, scale: 1.0, variant: 0 },
+  { kind: "flower", theta: 2.35, phi: 1.55, scale: 0.9, variant: 1, mobileHidden: true },
+  { kind: "flower", theta: 4.7, phi: 1.4, scale: 0.85, variant: 2, mobileHidden: true },
+  { kind: "star", theta: 1.05, phi: 1.85, scale: 0.85, radiusOffset: 0.8, variant: 1, mobileHidden: true },
+  { kind: "star", theta: 4.45, phi: 0.85, scale: 0.95, radiusOffset: 0.9, variant: 2, mobileHidden: true },
+  { kind: "tree", theta: 2.55, phi: 1.95, scale: 0.9, mobileHidden: true },
+
+  // ── 높은 바람산별: 봉우리·솔숲·눈·들풀 ─────────────────────
+  { planetId: "summit", kind: "mountain", theta: 2.0, phi: 1.5, scale: 2.4, variant: 1 },
+  { planetId: "summit", kind: "mountain", theta: 2.6, phi: 1.85, scale: 1.9, variant: 1 },
+  { planetId: "summit", kind: "mountain", theta: 1.4, phi: 1.8, scale: 1.7, variant: 0 },
+  { planetId: "summit", kind: "mountain", theta: 3.5, phi: 1.35, scale: 2.1, variant: 1 },
+  { planetId: "summit", kind: "mountain", theta: 4.9, phi: 1.7, scale: 1.6, variant: 0 },
+  { planetId: "summit", kind: "mountain", theta: 5.6, phi: 1.25, scale: 1.9, variant: 1 },
+  { planetId: "summit", kind: "tree", theta: 0.9, phi: 1.5, scale: 1.0 },
+  { planetId: "summit", kind: "tree", theta: 1.1, phi: 1.85, scale: 0.85 },
+  { planetId: "summit", kind: "tree", theta: 3.0, phi: 1.7, scale: 1.05 },
+  { planetId: "summit", kind: "tree", theta: 4.2, phi: 1.5, scale: 0.9 },
+  { planetId: "summit", kind: "tree", theta: 5.2, phi: 1.95, scale: 0.95 },
+  { planetId: "summit", kind: "grass", theta: 0.7, phi: 1.7, scale: 1.0, variant: 2 },
+  { planetId: "summit", kind: "grass", theta: 2.3, phi: 1.25, scale: 1.0, variant: 0 },
+  { planetId: "summit", kind: "grass", theta: 3.8, phi: 1.95, scale: 1.0, variant: 2 },
+  { planetId: "summit", kind: "grass", theta: 5.05, phi: 1.45, scale: 1.1, variant: 0 },
+  { planetId: "summit", kind: "rock", theta: 1.7, phi: 1.35, scale: 1.0 },
+  { planetId: "summit", kind: "rock", theta: 4.55, phi: 1.9, scale: 0.85 },
+  { planetId: "summit", kind: "rock", theta: 5.9, phi: 1.6, scale: 1.1 },
+  { planetId: "summit", kind: "lamp", theta: 0.5, phi: 1.95, scale: 0.95 },
+  { planetId: "summit", kind: "house", theta: 4.6, phi: 1.3, scale: 0.85 },
+  { planetId: "summit", kind: "star", theta: 2.1, phi: 0.7, scale: 1.0, radiusOffset: 0.95, variant: 1 },
+  { planetId: "summit", kind: "star", theta: 3.9, phi: 0.8, scale: 0.85, radiusOffset: 0.8, variant: 2 },
+  { planetId: "summit", kind: "star", theta: 5.5, phi: 2.1, scale: 0.9, radiusOffset: 0.85, variant: 0 },
+  { planetId: "summit", kind: "mushroom", theta: 0.95, phi: 1.65, scale: 0.9, variant: 0 },
+  { planetId: "summit", kind: "flower", theta: 2.7, phi: 1.55, scale: 0.85, variant: 2 },
+
+  // ── 물빛 바다별: 바다·모래톱·갈대·조개·종이배 ───────────────
+  { planetId: "tide", kind: "water", theta: 3.3, phi: 1.7, scale: 2.6 }, // 큰 바다
+  { planetId: "tide", kind: "water", theta: 5.5, phi: 1.45, scale: 1.3 }, // 떨어진 작은 호수
+  { planetId: "tide", kind: "reed", theta: 2.0, phi: 1.45, scale: 1.0, variant: 0 }, // 큰 바다 물가
+  { planetId: "tide", kind: "reed", theta: 4.5, phi: 1.4, scale: 0.9, variant: 1 }, // 큰 바다 물가
+  { planetId: "tide", kind: "reed", theta: 4.6, phi: 1.7, scale: 1.0, variant: 0 },
+  { planetId: "tide", kind: "paperBoat", theta: 3.3, phi: 1.5, scale: 1.0, variant: 0, radiusOffset: 0.05 },
+  { planetId: "tide", kind: "paperBoat", theta: 3.65, phi: 1.85, scale: 0.85, variant: 1, radiusOffset: 0.05 },
+  { planetId: "tide", kind: "shell", theta: 1.4, phi: 1.6, scale: 0.9, variant: 0 },
+  { planetId: "tide", kind: "shell", theta: 1.7, phi: 1.65, scale: 0.85, variant: 1 }, // 호수 밖 모래톱으로
+  { planetId: "tide", kind: "shell", theta: 0.6, phi: 1.85, scale: 0.8, variant: 0 },
+  { planetId: "tide", kind: "grass", theta: 1.1, phi: 1.4, scale: 1.0, variant: 0 },
+  { planetId: "tide", kind: "grass", theta: 0.4, phi: 1.55, scale: 1.0, variant: 1 }, // 호수 밖으로
+  { planetId: "tide", kind: "lamp", theta: 0.9, phi: 1.7, scale: 1.0 },
+  { planetId: "tide", kind: "cloud", theta: 2.0, phi: 0.8, scale: 1.0, radiusOffset: 0.9 },
+  { planetId: "tide", kind: "cloud", theta: 4.8, phi: 0.95, scale: 0.85, radiusOffset: 0.8 },
+  { planetId: "tide", kind: "star", theta: 1.7, phi: 0.7, scale: 0.9, radiusOffset: 0.85, variant: 1 },
+  { planetId: "tide", kind: "star", theta: 5.3, phi: 2.05, scale: 0.85, radiusOffset: 0.8, variant: 2 },
+  { planetId: "tide", kind: "flower", theta: 1.3, phi: 1.25, scale: 0.85, variant: 1 },
+  { planetId: "tide", kind: "tree", theta: 0.7, phi: 1.45, scale: 0.85 },
+  { planetId: "tide", kind: "mushroom", theta: 1.9, phi: 1.4, scale: 0.85, variant: 1 }, // 호수 밖으로
+
+  // ── 시냇물 풀별: 시내·들풀·들꽃·연못 ───────────────────────
+  { planetId: "brook", kind: "river", theta: 2.0, phi: 1.6, scale: 1.0 },
+  { planetId: "brook", kind: "river", theta: 4.3, phi: 1.85, scale: 1.0 },
+  { planetId: "brook", kind: "pond", theta: 3.0, phi: 1.4, scale: 1.3 },
+  { planetId: "brook", kind: "grass", theta: 0.8, phi: 1.5, scale: 1.1, variant: 0 },
+  { planetId: "brook", kind: "grass", theta: 1.5, phi: 1.75, scale: 1.1, variant: 1 },
+  { planetId: "brook", kind: "grass", theta: 2.4, phi: 1.35, scale: 1.2, variant: 0, mobileHidden: true },
+  { planetId: "brook", kind: "grass", theta: 3.3, phi: 1.8, scale: 1.1, variant: 1 },
+  { planetId: "brook", kind: "grass", theta: 4.0, phi: 1.45, scale: 1.2, variant: 0, mobileHidden: true },
+  { planetId: "brook", kind: "grass", theta: 4.9, phi: 1.7, scale: 1.1, variant: 1 },
+  { planetId: "brook", kind: "grass", theta: 5.6, phi: 1.4, scale: 1.2, variant: 0, mobileHidden: true },
+  { planetId: "brook", kind: "reed", theta: 2.2, phi: 1.55, scale: 1.0, variant: 0 },
+  { planetId: "brook", kind: "reed", theta: 4.0, phi: 1.8, scale: 0.9, variant: 1 },
+  { planetId: "brook", kind: "reed", theta: 3.15, phi: 1.32, scale: 0.95, variant: 0 },
+  { planetId: "brook", kind: "flower", theta: 0.95, phi: 1.65, scale: 0.95, variant: 0 },
+  { planetId: "brook", kind: "flower", theta: 1.7, phi: 1.5, scale: 0.9, variant: 1 },
+  { planetId: "brook", kind: "flower", theta: 2.7, phi: 1.7, scale: 1.0, variant: 2, mobileHidden: true },
+  { planetId: "brook", kind: "flower", theta: 3.6, phi: 1.55, scale: 0.9, variant: 0 },
+  { planetId: "brook", kind: "flower", theta: 4.5, phi: 1.6, scale: 0.95, variant: 1 },
+  { planetId: "brook", kind: "flower", theta: 5.3, phi: 1.75, scale: 0.9, variant: 2, mobileHidden: true },
+  { planetId: "brook", kind: "tree", theta: 1.2, phi: 1.95, scale: 1.0 },
+  { planetId: "brook", kind: "tree", theta: 3.9, phi: 1.25, scale: 0.9 },
+  { planetId: "brook", kind: "tree", theta: 5.1, phi: 1.95, scale: 0.95 },
+  { planetId: "brook", kind: "mushroom", theta: 2.05, phi: 1.85, scale: 0.9, variant: 0 },
+  { planetId: "brook", kind: "mushroom", theta: 4.7, phi: 1.4, scale: 0.85, variant: 1 },
+  { planetId: "brook", kind: "bench", theta: 1.9, phi: 1.3, scale: 0.95 },
+  { planetId: "brook", kind: "star", theta: 0.6, phi: 0.8, scale: 0.95, radiusOffset: 0.9, variant: 0 },
+  { planetId: "brook", kind: "star", theta: 3.2, phi: 0.75, scale: 0.85, radiusOffset: 0.8, variant: 1 },
+  { planetId: "brook", kind: "star", theta: 5.0, phi: 2.05, scale: 0.9, radiusOffset: 0.85, variant: 2 },
+  { planetId: "brook", kind: "rock", theta: 2.6, phi: 1.95, scale: 0.85 },
+  { planetId: "brook", kind: "lamp", theta: 4.4, phi: 1.5, scale: 0.9 },
 ];
