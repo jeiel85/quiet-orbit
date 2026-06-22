@@ -27,7 +27,11 @@ export type DecorationKind =
   | "paperBoat"
   | "ringStone"
   | "tinyFlag"
-  | "comet";
+  | "comet"
+  | "musicBox"
+  | "letterSpiral"
+  | "bubbleSpring"
+  | "moonGate";
 
 export interface Decoration {
   kind: DecorationKind;
@@ -125,6 +129,15 @@ export const decorations: Decoration[] = [
   { kind: "flower", theta: 6.05, phi: 1.35, scale: 1.0, variant: 2 },
   { kind: "flower", theta: 3.55, phi: 2.15, scale: 0.85, variant: 1 },
 
+  // ── 반응형 소품: 가까이 가거나 클릭하면 더 크게 살아난다 ─────────
+  { kind: "musicBox", theta: 2.05, phi: 1.05, scale: 0.9, variant: 0 },
+  { kind: "letterSpiral", theta: 4.82, phi: 1.22, scale: 0.95, variant: 1 },
+  { kind: "bubbleSpring", theta: 5.52, phi: 2.05, scale: 0.9, variant: 0 },
+  { kind: "moonGate", theta: 0.18, phi: 2.28, scale: 0.85, variant: 0 },
+  { kind: "musicBox", theta: 3.78, phi: 0.95, scale: 0.72, variant: 1 },
+  { kind: "letterSpiral", theta: 1.95, phi: 2.35, scale: 0.78, variant: 0 },
+  { kind: "bubbleSpring", theta: 2.78, phi: 2.45, scale: 0.72, variant: 1 },
+
   // ── 새벽 편지별: 종이배·연못·바람개비·편지함 ─────────────
   { planetId: "dawn", kind: "pond", theta: 0.55, phi: 1.92, scale: 1.25 },
   { planetId: "dawn", kind: "paperBoat", theta: 0.72, phi: 1.82, scale: 1.0, variant: 0 },
@@ -140,6 +153,11 @@ export const decorations: Decoration[] = [
   { planetId: "dawn", kind: "shell", theta: 5.65, phi: 1.85, scale: 0.7, variant: 1 },
   { planetId: "dawn", kind: "cloud", theta: 2.15, phi: 0.85, scale: 1.0, radiusOffset: 0.85 },
   { planetId: "dawn", kind: "cloud", theta: 4.95, phi: 1.0, scale: 0.8, radiusOffset: 0.75 },
+  { planetId: "dawn", kind: "letterSpiral", theta: 2.55, phi: 1.56, scale: 1.0, variant: 1 },
+  { planetId: "dawn", kind: "musicBox", theta: 5.85, phi: 1.46, scale: 0.88, variant: 0 },
+  { planetId: "dawn", kind: "bubbleSpring", theta: 3.12, phi: 2.22, scale: 0.86, variant: 0 },
+  { planetId: "dawn", kind: "moonGate", theta: 4.35, phi: 0.95, scale: 0.78, variant: 1 },
+  { planetId: "dawn", kind: "letterSpiral", theta: 0.16, phi: 1.35, scale: 0.75, variant: 0 },
   { planetId: "dawn", kind: "tree", theta: 0.95, phi: 1.55, scale: 0.8 },
   { planetId: "dawn", kind: "tree", theta: 2.25, phi: 2.05, scale: 0.9 },
   { planetId: "dawn", kind: "mushroom", theta: 3.7, phi: 1.85, scale: 0.9, variant: 1 },
@@ -162,6 +180,11 @@ export const decorations: Decoration[] = [
   { planetId: "ember", kind: "comet", theta: 5.7, phi: 1.05, scale: 0.75, radiusOffset: 0.8, variant: 1 },
   { planetId: "ember", kind: "tinyFlag", theta: 1.58, phi: 1.38, scale: 1.0, variant: 0 },
   { planetId: "ember", kind: "lantern", theta: 0.6, phi: 1.95, scale: 0.9, variant: 1 },
+  { planetId: "ember", kind: "moonGate", theta: 2.62, phi: 2.28, scale: 0.95, variant: 0 },
+  { planetId: "ember", kind: "bubbleSpring", theta: 4.05, phi: 0.98, scale: 0.82, variant: 1 },
+  { planetId: "ember", kind: "musicBox", theta: 5.92, phi: 1.88, scale: 0.82, variant: 1 },
+  { planetId: "ember", kind: "letterSpiral", theta: 3.18, phi: 2.38, scale: 0.78, variant: 0 },
+  { planetId: "ember", kind: "moonGate", theta: 0.2, phi: 1.34, scale: 0.72, variant: 1 },
   { planetId: "ember", kind: "volcano", theta: 5.3, phi: 1.55, scale: 1.0, variant: 1 },
   { planetId: "ember", kind: "volcano", theta: 3.35, phi: 1.45, scale: 0.85, variant: 0 },
   { planetId: "ember", kind: "rock", theta: 0.95, phi: 1.7, scale: 1.0 },
@@ -189,6 +212,11 @@ export const decorations: Decoration[] = [
   { planetId: "violet", kind: "star", theta: 4.15, phi: 1.7, scale: 0.9, radiusOffset: 0.85, variant: 2 },
   { planetId: "violet", kind: "star", theta: 5.8, phi: 2.0, scale: 0.8, radiusOffset: 0.75, variant: 1 },
   { planetId: "violet", kind: "lantern", theta: 0.95, phi: 1.75, scale: 0.85, variant: 1 },
+  { planetId: "violet", kind: "moonGate", theta: 2.72, phi: 0.92, scale: 0.96, variant: 1 },
+  { planetId: "violet", kind: "letterSpiral", theta: 3.92, phi: 2.28, scale: 0.82, variant: 1 },
+  { planetId: "violet", kind: "musicBox", theta: 0.52, phi: 2.18, scale: 0.8, variant: 0 },
+  { planetId: "violet", kind: "bubbleSpring", theta: 4.56, phi: 1.48, scale: 0.78, variant: 0 },
+  { planetId: "violet", kind: "letterSpiral", theta: 5.22, phi: 2.34, scale: 0.72, variant: 0 },
   { planetId: "violet", kind: "flower", theta: 1.35, phi: 1.25, scale: 0.9, variant: 2 },
   { planetId: "violet", kind: "flower", theta: 2.9, phi: 2.18, scale: 0.8, variant: 1 },
   { planetId: "violet", kind: "mushroom", theta: 4.85, phi: 1.9, scale: 0.8, variant: 1 },

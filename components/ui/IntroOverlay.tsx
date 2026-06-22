@@ -13,9 +13,11 @@ export default function IntroOverlay() {
 
   return (
     <div
-      className={`absolute inset-0 z-20 flex items-center justify-center bg-[color:var(--color-sky)]/70 backdrop-blur-md transition-opacity duration-700 ${
-        started ? "pointer-events-none opacity-0" : "pointer-events-auto opacity-100"
-      }`}
+      className="absolute inset-0 z-20 flex items-center justify-center bg-[color:var(--color-sky)]/70 backdrop-blur-md transition-opacity duration-700"
+      style={{
+        opacity: started ? 0 : 1,
+        pointerEvents: started ? "none" : "auto",
+      }}
       aria-hidden={started}
     >
       <div className="mx-6 max-w-sm text-center">

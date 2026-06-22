@@ -901,6 +901,248 @@ function Comet({ variant = 0, phase }: { variant?: number; phase: number }) {
   );
 }
 
+// ── 작은 뮤직박스 (인터랙티브) ───────────────────────────────
+function MusicBox({
+  variant = 0,
+  phase,
+  proxPosition,
+  transform,
+  blob,
+}: InteractiveProps & { variant?: number; phase: number }) {
+  const lid = useRef<Group>(null);
+  const crank = useRef<Group>(null);
+  const note = useRef<Group>(null);
+  const noteMat = useRef<MeshStandardMaterial>(null);
+  const burst = useRef(0);
+  const wood = variant % 2 === 0 ? "#b8845b" : "#7f75aa";
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const p = proximityOf(transform.position.distanceTo(proxPosition));
+    const rm = reduce();
+    const t = state.clock.elapsedTime;
+    burst.current = Math.max(0, burst.current - delta * 1.2);
+
+    if (lid.current) lid.current.rotation.x = MathUtils.lerp(lid.current.rotation.x, -0.18 - p * 0.8 - burst.current * 0.25, 1 - Math.exp(-7 * delta));
+    if (crank.current && !rm) crank.current.rotation.z += delta * (1.2 + p * 5 + burst.current * 7);
+    if (note.current) {
+      note.current.position.y = 0.35 + (rm ? 0 : Math.sin(t * 1.8 + phase) * 0.035) + p * 0.08 + burst.current * 0.12;
+      note.current.rotation.y += delta * (0.5 + p * 1.8);
+    }
+    if (noteMat.current) noteMat.current.emissiveIntensity = MathUtils.lerp(noteMat.current.emissiveIntensity, 0.25 + p * 1.4 + burst.current * 1.6, 1 - Math.exp(-8 * delta));
+  });
+  return (
+    <group
+      onClick={(e) => {
+        e.stopPropagation();
+        burst.current = 1;
+      }}
+      onPointerOver={() => setCursor(true)}
+      onPointerOut={() => setCursor(false)}
+    >
+      {blob && <ShadowBlob radius={0.28} />}
+      <mesh position={[0, 0.09, 0]}>
+        <boxGeometry args={[0.26, 0.18, 0.22]} />
+        <meshStandardMaterial color={wood} roughness={0.78} />
+      </mesh>
+      <group ref={lid} position={[0, 0.19, -0.08]}>
+        <mesh position={[0, 0, 0.08]}>
+          <boxGeometry args={[0.28, 0.035, 0.23]} />
+          <meshStandardMaterial color={variant % 2 === 0 ? "#e0b078" : "#a89bd6"} roughness={0.62} />
+        </mesh>
+      </group>
+      <group ref={crank} position={[0.15, 0.12, 0]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.035, 0.006, 6, 12]} />
+          <meshStandardMaterial color="#f0c96a" roughness={0.45} metalness={0.25} />
+        </mesh>
+        <mesh position={[0.04, 0, 0]}>
+          <sphereGeometry args={[0.014, 8, 6]} />
+          <meshStandardMaterial color="#fff0bd" roughness={0.4} />
+        </mesh>
+      </group>
+      <group ref={note} position={[0, 0.35, 0]}>
+        <mesh>
+          <sphereGeometry args={[0.025, 8, 6]} />
+          <meshStandardMaterial ref={noteMat} color="#ffe8a8" emissive="#ffe8a8" emissiveIntensity={0.25} toneMapped={false} />
+        </mesh>
+        <mesh position={[0.035, 0.065, 0]}>
+          <boxGeometry args={[0.012, 0.12, 0.012]} />
+          <meshStandardMaterial color="#ffe8a8" emissive="#ffe8a8" emissiveIntensity={0.25} toneMapped={false} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ── 편지 나선 (인터랙티브) ───────────────────────────────────
+function LetterSpiral({
+  variant = 0,
+  phase,
+  proxPosition,
+  transform,
+  blob,
+}: InteractiveProps & { variant?: number; phase: number }) {
+  const ring = useRef<Group>(null);
+  const glow = useRef<MeshStandardMaterial>(null);
+  const burst = useRef(0);
+  const papers = useMemo(() => [0, 1, 2, 3].map((i) => (i / 4) * Math.PI * 2), []);
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const p = proximityOf(transform.position.distanceTo(proxPosition));
+    burst.current = Math.max(0, burst.current - delta * 1.35);
+    if (ring.current && !reduce()) {
+      ring.current.rotation.y += delta * (0.35 + p * 1.4 + burst.current * 2);
+      ring.current.position.y = Math.sin(state.clock.elapsedTime * 1.1 + phase) * 0.025 + p * 0.035;
+    }
+    if (glow.current) glow.current.opacity = MathUtils.lerp(glow.current.opacity, 0.12 + p * 0.2 + burst.current * 0.22, 1 - Math.exp(-8 * delta));
+  });
+  return (
+    <group
+      onClick={(e) => {
+        e.stopPropagation();
+        burst.current = 1;
+      }}
+      onPointerOver={() => setCursor(true)}
+      onPointerOut={() => setCursor(false)}
+    >
+      {blob && <ShadowBlob radius={0.22} />}
+      <mesh position={[0, 0.13, 0]}>
+        <cylinderGeometry args={[0.014, 0.018, 0.26, 6]} />
+        <meshStandardMaterial color="#776657" roughness={0.76} />
+      </mesh>
+      <group ref={ring} position={[0, 0.27, 0]}>
+        {papers.map((angle, i) => (
+          <mesh
+            key={i}
+            position={[Math.cos(angle) * 0.14, i * 0.035, Math.sin(angle) * 0.14]}
+            rotation={[0.35, -angle + Math.PI / 2, Math.sin(phase + i) * 0.3]}
+          >
+            <boxGeometry args={[0.09, 0.055, 0.006]} />
+            <meshStandardMaterial color={i % 2 === variant % 2 ? "#fff3dc" : "#dcecf5"} roughness={0.5} />
+          </mesh>
+        ))}
+        <mesh>
+          <sphereGeometry args={[0.19, 12, 10]} />
+          <meshStandardMaterial ref={glow} color="#dcecff" transparent opacity={0.12} depthWrite={false} toneMapped={false} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// ── 물방울 샘 (인터랙티브) ───────────────────────────────────
+function BubbleSpring({
+  variant = 0,
+  phase,
+  proxPosition,
+  transform,
+  blob,
+}: InteractiveProps & { variant?: number; phase: number }) {
+  const water = useRef<MeshStandardMaterial>(null);
+  const bubbles = useRef<Group>(null);
+  const burst = useRef(0);
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const p = proximityOf(transform.position.distanceTo(proxPosition));
+    const rm = reduce();
+    const t = state.clock.elapsedTime;
+    burst.current = Math.max(0, burst.current - delta * 1.1);
+    if (water.current) water.current.emissiveIntensity = MathUtils.lerp(water.current.emissiveIntensity, 0.18 + p * 0.45 + burst.current * 0.5, 1 - Math.exp(-7 * delta));
+    if (bubbles.current && !rm) {
+      bubbles.current.position.y = Math.sin(t * 1.6 + phase) * 0.04 + p * 0.08 + burst.current * 0.16;
+      bubbles.current.rotation.y += delta * (0.35 + p);
+    }
+  });
+  return (
+    <group
+      onClick={(e) => {
+        e.stopPropagation();
+        burst.current = 1;
+      }}
+      onPointerOver={() => setCursor(true)}
+      onPointerOut={() => setCursor(false)}
+    >
+      {blob && <ShadowBlob radius={0.32} />}
+      <mesh position={[0, 0.065, 0]} scale={[1.2, 0.45, 1]}>
+        <sphereGeometry args={[0.16, 14, 10]} />
+        <meshStandardMaterial color={variant % 2 === 0 ? "#b7a58e" : "#a8a5b2"} roughness={0.9} flatShading />
+      </mesh>
+      <mesh position={[0, 0.125, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[0.13, 20]} />
+        <meshStandardMaterial ref={water} color="#8ed6e2" emissive="#8ed6e2" emissiveIntensity={0.18} roughness={0.24} toneMapped={false} />
+      </mesh>
+      <group ref={bubbles} position={[0, 0.23, 0]}>
+        {[0, 1, 2].map((i) => (
+          <mesh key={i} position={[Math.cos(phase + i) * 0.06, i * 0.055, Math.sin(phase + i) * 0.045]}>
+            <sphereGeometry args={[0.025 - i * 0.004, 8, 6]} />
+            <meshStandardMaterial color="#d9f6ff" transparent opacity={0.72} roughness={0.1} depthWrite={false} />
+          </mesh>
+        ))}
+      </group>
+    </group>
+  );
+}
+
+// ── 달문 (인터랙티브) ───────────────────────────────────────
+function MoonGate({
+  variant = 0,
+  phase,
+  proxPosition,
+  transform,
+  blob,
+}: InteractiveProps & { variant?: number; phase: number }) {
+  const gate = useRef<Group>(null);
+  const halo = useRef<MeshStandardMaterial>(null);
+  const stars = useRef<Group>(null);
+  const pulse = useRef(0);
+  const color = variant % 2 === 0 ? "#d9ccff" : "#bfe6f5";
+  useFrame((state, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const p = proximityOf(transform.position.distanceTo(proxPosition));
+    pulse.current = Math.max(0, pulse.current - delta * 1.4);
+    if (gate.current) gate.current.scale.setScalar(MathUtils.lerp(gate.current.scale.x, 1 + p * 0.08 + pulse.current * 0.12, 1 - Math.exp(-7 * delta)));
+    if (stars.current && !reduce()) stars.current.rotation.z += delta * (0.45 + p * 1.3 + pulse.current * 2);
+    if (halo.current) halo.current.opacity = MathUtils.lerp(halo.current.opacity, 0.18 + p * 0.24 + pulse.current * 0.25 + Math.sin(state.clock.elapsedTime * 2 + phase) * 0.02, 1 - Math.exp(-8 * delta));
+  });
+  return (
+    <group
+      onClick={(e) => {
+        e.stopPropagation();
+        pulse.current = 1;
+      }}
+      onPointerOver={() => setCursor(true)}
+      onPointerOut={() => setCursor(false)}
+    >
+      {blob && <ShadowBlob radius={0.4} />}
+      <group ref={gate} position={[0, 0.26, 0]}>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.2, 0.028, 8, 24]} />
+          <meshStandardMaterial color="#9f98ae" roughness={0.84} flatShading />
+        </mesh>
+        <mesh rotation={[Math.PI / 2, 0, 0]}>
+          <torusGeometry args={[0.155, 0.01, 6, 20]} />
+          <meshStandardMaterial ref={halo} color={color} emissive={color} emissiveIntensity={0.7} transparent opacity={0.18} depthWrite={false} toneMapped={false} />
+        </mesh>
+        <group ref={stars}>
+          {[0, 1, 2].map((i) => {
+            const angle = phase + (i / 3) * Math.PI * 2;
+            return (
+              <mesh key={i} position={[Math.cos(angle) * 0.1, Math.sin(angle) * 0.1, 0.02]}>
+                <icosahedronGeometry args={[0.022, 0]} />
+                <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.8} roughness={0.3} toneMapped={false} flatShading />
+              </mesh>
+            );
+          })}
+        </group>
+      </group>
+      <mesh position={[0, 0.04, 0]}>
+        <boxGeometry args={[0.34, 0.06, 0.12]} />
+        <meshStandardMaterial color="#8f8798" roughness={0.9} flatShading />
+      </mesh>
+    </group>
+  );
+}
+
 function renderKind(
   decoration: Decoration,
   index: number,
@@ -964,6 +1206,14 @@ function renderKind(
       return <TinyFlag variant={decoration.variant} phase={phase} blob={blob} />;
     case "comet":
       return <Comet variant={decoration.variant} phase={phase} />;
+    case "musicBox":
+      return <MusicBox variant={decoration.variant} phase={phase} proxPosition={proxPosition} transform={transform} blob={blob} />;
+    case "letterSpiral":
+      return <LetterSpiral variant={decoration.variant} phase={phase} proxPosition={proxPosition} transform={transform} blob={blob} />;
+    case "bubbleSpring":
+      return <BubbleSpring variant={decoration.variant} phase={phase} proxPosition={proxPosition} transform={transform} blob={blob} />;
+    case "moonGate":
+      return <MoonGate variant={decoration.variant} phase={phase} proxPosition={proxPosition} transform={transform} blob={blob} />;
   }
 }
 

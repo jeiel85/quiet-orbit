@@ -20,7 +20,7 @@ export default function InteractionHint() {
     const target = getPlanet(spot.targetPlanetId);
     return (
       <div className="pointer-events-auto absolute bottom-24 left-1/2 w-[min(calc(100vw-2rem),26rem)] -translate-x-1/2">
-        <div className="flex items-center justify-between gap-3 rounded-2xl bg-[color:var(--color-text)]/88 px-4 py-3 text-sm text-[color:var(--color-background)] shadow-lg backdrop-blur-sm">
+        <div className="interaction-card flex items-center justify-between gap-3 rounded-2xl bg-[color:var(--color-text)]/88 px-4 py-3 text-sm text-[color:var(--color-background)] shadow-lg backdrop-blur-sm">
           <div className="min-w-0">
             <p className="truncate font-medium">{spot.label}</p>
             <p className="mt-0.5 truncate text-xs opacity-70">{target.subtitle}</p>
@@ -28,7 +28,7 @@ export default function InteractionHint() {
           <button
             type="button"
             onClick={() => useGameStore.getState().beginTravel(spot)}
-            className="shrink-0 rounded-full bg-[color:var(--color-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--color-text)] transition active:scale-[0.98]"
+            className="shrink-0 rounded-full bg-[color:var(--color-accent)] px-4 py-2 text-sm font-semibold text-[color:var(--color-text)] transition hover:brightness-105 active:scale-[0.96]"
           >
             이동하기
           </button>
@@ -42,7 +42,7 @@ export default function InteractionHint() {
 
   return (
     <div className="pointer-events-none absolute bottom-24 left-1/2 -translate-x-1/2">
-      <div className="rounded-full bg-[color:var(--color-text)]/85 px-4 py-2 text-center text-sm text-[color:var(--color-background)] shadow-lg backdrop-blur-sm">
+      <div className="interaction-card rounded-full bg-[color:var(--color-text)]/85 px-4 py-2 text-center text-sm text-[color:var(--color-background)] shadow-lg backdrop-blur-sm">
         {message ? <span className="opacity-70">‘{message.title}’ · </span> : null}
         <span className="font-medium">Space</span>
         <span className="opacity-70"> 또는 탭으로 열기</span>

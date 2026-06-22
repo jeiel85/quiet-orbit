@@ -4,16 +4,18 @@
 
 ## 현재 사용 중
 
-현재 사용 중인 GLB 모델은 없습니다.
+### 플레이어
 
-플레이어 아바타(어린왕자)와 여우 컴패니언은 모두 코드로 만든 **primitive 지오메트리**입니다 —
-GLB 로더를 거치지 않습니다. 관련 컴포넌트:
+- `player-kenney-mini-male-a-v001.glb`
+  - 출처: [Kenney Mini Characters](https://kenney.nl/assets/mini-characters)
+  - 라이선스: Creative Commons CC0
+  - 로컬 라이선스 사본: `kenney-mini-characters-license.txt`
+  - 참조 텍스처: `Textures/colormap.png`
+  - 사용처: [`components/player/PrimitivePrince.tsx`](../../components/player/PrimitivePrince.tsx)
 
-- [`components/player/PrimitivePrince.tsx`](../../components/player/PrimitivePrince.tsx) — 플레이어 아바타
+### 코드 지오메트리
+
 - [`components/player/PrimitiveFox.tsx`](../../components/player/PrimitiveFox.tsx) — 여우 컴패니언(월드 데코)
-
-> 초기 버전은 `Fox.glb`(Khronos glTF-Sample-Assets)를 플레이어로 썼지만,
-> 어린왕자 테마 전환 이후 primitive 로 교체하면서 제거했습니다.
 
 ## 규칙
 
