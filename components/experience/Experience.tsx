@@ -11,6 +11,7 @@ import IntroOverlay from "@/components/ui/IntroOverlay";
 import MessagePanel from "@/components/ui/MessagePanel";
 import MobileJoystick from "@/components/controls/MobileJoystick";
 import TravelOverlay from "@/components/ui/TravelOverlay";
+import SettingsPanel from "@/components/ui/SettingsPanel";
 
 /**
  * 전체 화면 WebGL Canvas + UI 오버레이 레이어.
@@ -55,6 +56,7 @@ export default function Experience() {
       <MobileJoystick />
       <MessagePanel />
       <TravelOverlay />
+      <SettingsPanel />
       <IntroOverlay />
     </div>
   );

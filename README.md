@@ -24,11 +24,12 @@
 
 ## 주요 기능
 
-- *어린왕자*에서 영감을 받은 **작은 여행자 캐릭터**(흩날리는 스카프)로 걷는 **구면 이동** + 부드러운 3인칭 추적 카메라
+- *어린왕자*에서 영감을 받은 **작은 여행자 캐릭터**로 걷는 **구면 이동** + 부드러운 3인칭 추적 카메라
 - 표면에 흩어진 **메시지 Orb** — 가까이 가면 안내가 뜨고, 열어서 읽을 수 있음(14개)
 - 읽은 메시지는 흐릿해지고, **새로고침 후에도 읽음 상태 유지**(localStorage)
 - 장미(유리돔)·화산·바오바브·가로등·떠 있는 별·여우 컴패니언·버섯 등 **꽉 찬 장식 오브젝트**(약 50개)
 - **반응하는 오브젝트** — 가까이 가면 장미가 빛나고 별이 더 반짝이며, 클릭하면 화산이 연기를 뿜고 여우가 폴짝
+- **캐릭터 외형 커스터마이징** — 우상단 톱니 설정에서 피부·머리·상의·하의·신발 색을 직접 고르거나, 조화로운 프리셋(여행자/노을/심해/숲/달빛)으로 전환. 선택은 저장돼 **새로고침 후에도 유지**되고, 걷기/숨쉬기 등 **모션은 그대로** 유지됨
 - 시작 안내 **인트로 오버레이** + **모바일 가상 조이스틱** & 데스크톱 키보드 조작
 - **동작 줄이기(reduce motion)** 설정 존중, 모바일 성능 옵션(dpr/antialias 하향)
 
@@ -69,11 +70,12 @@ components/experience/    Canvas · Scene 구성
 components/world/         Planet · MessageOrb(Group) · Decorations
 components/player/        Player(구면 이동) · CameraRig
 components/controls/      키보드 입력 · 메시지 키 · 모바일 조이스틱
-components/ui/            인트로 · 상호작용 힌트 · 메시지 패널 · 로딩
+components/ui/            인트로 · 상호작용 힌트 · 메시지 패널 · 설정 패널 · 로딩
 config/                   theme · worldConfig · messages · decorations
 lib/math/                 sphericalMovement · sphericalCoords
 lib/input/                키보드+조이스틱 합산 싱글톤(movementInput)
-lib/storage/              localProgress (localStorage 접근 일원화)
+lib/player/               avatarAnim · 외형 커스터마이징(avatarAppearance · recolorColormap)
+lib/storage/              localProgress · localAppearance (localStorage 접근 일원화)
 lib/audio/                soundManager (구조 스텁)
 store/                    useGameStore · useMessageStore · useSettingsStore
 types/                    world · message · online(확장용 타입)
@@ -85,7 +87,8 @@ docs/                     GitHub Pages 소개 페이지 + 설계 묶음(docs/des
 
 - 메시지는 정적 데이터([`config/messages.ts`](config/messages.ts)). 위치는 구면 좌표(theta/phi).
 - 읽음 상태는 localStorage([`lib/storage/localProgress.ts`](lib/storage/localProgress.ts))에만 저장 — 서버·로그인 없음.
-- 상태는 zustand 3분할: 게임(active/opened/started) · 메시지(read) · 설정(reduce motion/touch/sound).
+- 상태는 zustand 3분할: 게임(active/opened/started) · 메시지(read) · 설정(reduce motion/touch/sound/아바타 외형).
+- 아바타 외형은 localStorage([`lib/storage/localAppearance.ts`](lib/storage/localAppearance.ts))에 저장. 색은 모델의 공유 팔레트 텍스처를 부위별로 다시 칠해 교체하므로([`lib/player/recolorColormap.ts`](lib/player/recolorColormap.ts)) 스켈레톤·애니메이션과 무관하게 모션이 유지됨.
 - **온라인 확장 준비**: 실제 서버 연동은 하지 않되, 후속(방명록/흔적/presence)용 타입을
   [`types/online.ts`](types/online.ts) 에 정의해 두었습니다. 자세한 계획은
   [`docs/design/10_multiplayer_future.md`](docs/design/10_multiplayer_future.md).
@@ -123,8 +126,10 @@ vercel --prod   # production 배포
 
 ## 크레딧 (외부 에셋)
 
-- 플레이어 캐릭터(작은 여행자)와 여우 컴패니언은 모두 **직접 제작한 primitive 지오메트리**입니다 —
-  외부 모델을 쓰지 않습니다.
+- 플레이어 캐릭터(작은 여행자)는 [**Kenney Mini Characters**](https://kenney.nl/assets/mini-characters)
+  GLB(**CC0**)를 사용합니다 — rig/애니메이션은 모델 자체의 것을 쓰고, 외형 색만 팔레트 텍스처를 다시 칠해
+  바꿉니다. 라이선스 사본·출처는 [`public/models/`](public/models/) README 참고.
+- 여우 컴패니언 등 월드 장식은 **직접 제작한 primitive 지오메트리**입니다.
 
 ## 라이선스 · 출처
 
